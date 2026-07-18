@@ -1,0 +1,458 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000100002 /* MusicConverterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100001 /* MusicConverterApp.swift */; };
+		000000000000000000100004 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100003 /* ContentView.swift */; };
+		000000000000000000100006 /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100005 /* DownloadView.swift */; };
+		000000000000000000100008 /* ConvertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100007 /* ConvertView.swift */; };
+		00000000000000000010000A /* NCMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100009 /* NCMView.swift */; };
+		00000000000000000010000C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000B /* SettingsView.swift */; };
+		00000000000000000010000E /* FileDropZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000D /* FileDropZone.swift */; };
+		000000000000000000100010 /* DownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000F /* DownloadTask.swift */; };
+		000000000000000000100012 /* ConvertTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100011 /* ConvertTask.swift */; };
+		000000000000000000100014 /* NCMTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100013 /* NCMTask.swift */; };
+		000000000000000000100016 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100015 /* AppSettings.swift */; };
+		000000000000000000100018 /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100017 /* ToolManager.swift */; };
+		00000000000000000010001A /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100019 /* ProcessRunner.swift */; };
+		00000000000000000010001C /* YtDlpService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010001B /* YtDlpService.swift */; };
+		00000000000000000010001E /* FFmpegService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010001D /* FFmpegService.swift */; };
+		000000000000000000100020 /* NcmdumpService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010001F /* NcmdumpService.swift */; };
+		000000000000000000100022 /* ServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100021 /* ServiceError.swift */; };
+		000000000000000000100024 /* PlatformDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100023 /* PlatformDetector.swift */; };
+		000000000000000000100026 /* FileUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100025 /* FileUtil.swift */; };
+		000000000000000000100028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100027 /* Assets.xcassets */; };
+		000000000000000000100051 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100050 /* AppDelegate.swift */; };
+		000000000000000000100053 /* TaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100052 /* TaskListView.swift */; };
+		000000000000000000100055 /* URLInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100054 /* URLInputField.swift */; };
+		000000000000000000100057 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100056 /* ProgressBar.swift */; };
+		000000000000000000100059 /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100058 /* ffmpeg */; };
+		00000000000000000010005B /* ncmdump in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005A /* ncmdump */; };
+		00000000000000000010005D /* yt-dlp in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005C /* yt-dlp */; };
+		000000000000000000100061 /* MenuBarStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100060 /* MenuBarStateManager.swift */; };
+		000000000000000000100063 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100062 /* MenuBarPopoverView.swift */; };
+		000000000000000000100065 /* MusicLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100064 /* MusicLibraryStore.swift */; };
+		000000000000000000100067 /* MetadataReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100066 /* MetadataReader.swift */; };
+		000000000000000000100069 /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100068 /* AudioPlayerService.swift */; };
+		00000000000000000010006B /* MusicLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010006A /* MusicLibraryView.swift */; };
+		00000000000000000010006E /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010006D /* TutorialView.swift */; };
+		000000000000000000100071 /* IAPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100070 /* IAPManager.swift */; };
+		000000000000000000100073 /* ProPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100072 /* ProPurchaseView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000100001 /* MusicConverterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicConverterApp.swift"; sourceTree = "<group>"; };
+		000000000000000000100003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		000000000000000000100005 /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadView.swift"; sourceTree = "<group>"; };
+		000000000000000000100007 /* ConvertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConvertView.swift"; sourceTree = "<group>"; };
+		000000000000000000100009 /* NCMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMView.swift"; sourceTree = "<group>"; };
+		00000000000000000010000B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
+		00000000000000000010000D /* FileDropZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileDropZone.swift"; sourceTree = "<group>"; };
+		00000000000000000010000F /* DownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadTask.swift"; sourceTree = "<group>"; };
+		000000000000000000100011 /* ConvertTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConvertTask.swift"; sourceTree = "<group>"; };
+		000000000000000000100013 /* NCMTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMTask.swift"; sourceTree = "<group>"; };
+		000000000000000000100015 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSettings.swift"; sourceTree = "<group>"; };
+		000000000000000000100017 /* ToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolManager.swift"; sourceTree = "<group>"; };
+		000000000000000000100019 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessRunner.swift"; sourceTree = "<group>"; };
+		00000000000000000010001B /* YtDlpService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YtDlpService.swift"; sourceTree = "<group>"; };
+		00000000000000000010001D /* FFmpegService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FFmpegService.swift"; sourceTree = "<group>"; };
+		00000000000000000010001F /* NcmdumpService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NcmdumpService.swift"; sourceTree = "<group>"; };
+		000000000000000000100021 /* ServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServiceError.swift"; sourceTree = "<group>"; };
+		000000000000000000100023 /* PlatformDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlatformDetector.swift"; sourceTree = "<group>"; };
+		000000000000000000100025 /* FileUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileUtil.swift"; sourceTree = "<group>"; };
+		000000000000000000100027 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		000000000000000000100038 /* MusicConverter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicConverter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000100050 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate.swift"; sourceTree = "<group>"; };
+		000000000000000000100052 /* TaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskListView.swift"; sourceTree = "<group>"; };
+		000000000000000000100054 /* URLInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLInputField.swift"; sourceTree = "<group>"; };
+		000000000000000000100056 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProgressBar.swift"; sourceTree = "<group>"; };
+		000000000000000000100058 /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ffmpeg"; sourceTree = "<group>"; };
+		00000000000000000010005A /* ncmdump */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ncmdump"; sourceTree = "<group>"; };
+		00000000000000000010005C /* yt-dlp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "yt-dlp"; sourceTree = "<group>"; };
+		000000000000000000100060 /* MenuBarStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MenuBarStateManager.swift"; sourceTree = "<group>"; };
+		000000000000000000100062 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MenuBarPopoverView.swift"; sourceTree = "<group>"; };
+		000000000000000000100064 /* MusicLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLibraryStore.swift"; sourceTree = "<group>"; };
+		000000000000000000100066 /* MetadataReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MetadataReader.swift"; sourceTree = "<group>"; };
+		000000000000000000100068 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioPlayerService.swift"; sourceTree = "<group>"; };
+		00000000000000000010006A /* MusicLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLibraryView.swift"; sourceTree = "<group>"; };
+		00000000000000000010006D /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TutorialView.swift"; sourceTree = "<group>"; };
+		000000000000000000100070 /* IAPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IAPManager.swift"; sourceTree = "<group>"; };
+		000000000000000000100072 /* ProPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProPurchaseView.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000100037 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00000000000000000010002A = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000010002B /* MusicConverter */,
+				00000000000000000010002C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+
+		00000000000000000010002C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100038 /* MusicConverter.app */,
+			);
+			path = "Products";
+			sourceTree = "<group>";
+		};
+
+		00000000000000000010002B /* MusicConverter */ = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000010002D /* App */,
+				00000000000000000010002E /* Views */,
+				000000000000000000100030 /* Models */,
+				000000000000000000100031 /* Services */,
+				000000000000000000100032 /* Utilities */,
+				000000000000000000100033 /* Resources */,
+			);
+			path = "MusicConverter";
+			sourceTree = "<group>";
+		};
+
+		00000000000000000010002D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100001 /* MusicConverterApp.swift */,
+				000000000000000000100050 /* AppDelegate.swift */,
+			);
+			path = "App";
+			sourceTree = "<group>";
+		};
+
+		00000000000000000010002E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000010002F /* Components */,
+				000000000000000000100003 /* ContentView.swift */,
+				000000000000000000100005 /* DownloadView.swift */,
+				000000000000000000100007 /* ConvertView.swift */,
+				000000000000000000100009 /* NCMView.swift */,
+				000000000000000000100052 /* TaskListView.swift */,
+				00000000000000000010000B /* SettingsView.swift */,
+				000000000000000000100062 /* MenuBarPopoverView.swift */,
+				00000000000000000010006A /* MusicLibraryView.swift */,
+				00000000000000000010006D /* TutorialView.swift */,
+				000000000000000000100072 /* ProPurchaseView.swift */,
+			);
+			path = "Views";
+			sourceTree = "<group>";
+		};
+
+		00000000000000000010002F /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000010000D /* FileDropZone.swift */,
+				000000000000000000100054 /* URLInputField.swift */,
+				000000000000000000100056 /* ProgressBar.swift */,
+			);
+			path = "Components";
+			sourceTree = "<group>";
+		};
+
+		000000000000000000100030 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				00000000000000000010000F /* DownloadTask.swift */,
+				000000000000000000100011 /* ConvertTask.swift */,
+				000000000000000000100013 /* NCMTask.swift */,
+				000000000000000000100015 /* AppSettings.swift */,
+			);
+			path = "Models";
+			sourceTree = "<group>";
+		};
+
+		000000000000000000100031 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100017 /* ToolManager.swift */,
+				000000000000000000100019 /* ProcessRunner.swift */,
+				00000000000000000010001B /* YtDlpService.swift */,
+				00000000000000000010001D /* FFmpegService.swift */,
+				00000000000000000010001F /* NcmdumpService.swift */,
+				000000000000000000100021 /* ServiceError.swift */,
+				000000000000000000100060 /* MenuBarStateManager.swift */,
+				000000000000000000100064 /* MusicLibraryStore.swift */,
+				000000000000000000100066 /* MetadataReader.swift */,
+				000000000000000000100068 /* AudioPlayerService.swift */,
+				000000000000000000100070 /* IAPManager.swift */,
+			);
+			path = "Services";
+			sourceTree = "<group>";
+		};
+
+		000000000000000000100032 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100023 /* PlatformDetector.swift */,
+				000000000000000000100025 /* FileUtil.swift */,
+			);
+			path = "Utilities";
+			sourceTree = "<group>";
+		};
+
+		000000000000000000100033 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100027 /* Assets.xcassets */,
+				000000000000000000100058 /* ffmpeg */,
+				00000000000000000010005A /* ncmdump */,
+				00000000000000000010005C /* yt-dlp */,
+			);
+			path = "Resources";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000100034 /* MusicConverter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00000000000000000010003C /* Build configuration list for PBXNativeTarget "MusicConverter" */;
+			buildPhases = (
+				000000000000000000100035 /* Sources */,
+				000000000000000000100037 /* Frameworks */,
+				000000000000000000100036 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MusicConverter;
+			productName = MusicConverter;
+			productReference = 000000000000000000100038 /* MusicConverter.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000100029 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					000000000000000000100034 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 00000000000000000010003B /* Build configuration list for PBXProject "MusicConverter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				"zh-Hans",
+				Base,
+			);
+			mainGroup = 00000000000000000010002A;
+			productRefGroup = 00000000000000000010002C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000100034 /* MusicConverter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000100036 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000100028 /* Assets.xcassets in Resources */,
+				000000000000000000100059 /* ffmpeg in Resources */,
+				00000000000000000010005B /* ncmdump in Resources */,
+				00000000000000000010005D /* yt-dlp in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000100035 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000100002 /* MusicConverterApp.swift in Sources */,
+				000000000000000000100004 /* ContentView.swift in Sources */,
+				000000000000000000100006 /* DownloadView.swift in Sources */,
+				000000000000000000100008 /* ConvertView.swift in Sources */,
+				00000000000000000010000A /* NCMView.swift in Sources */,
+				00000000000000000010000C /* SettingsView.swift in Sources */,
+				00000000000000000010000E /* FileDropZone.swift in Sources */,
+				000000000000000000100010 /* DownloadTask.swift in Sources */,
+				000000000000000000100012 /* ConvertTask.swift in Sources */,
+				000000000000000000100014 /* NCMTask.swift in Sources */,
+				000000000000000000100016 /* AppSettings.swift in Sources */,
+				000000000000000000100018 /* ToolManager.swift in Sources */,
+				00000000000000000010001A /* ProcessRunner.swift in Sources */,
+				00000000000000000010001C /* YtDlpService.swift in Sources */,
+				00000000000000000010001E /* FFmpegService.swift in Sources */,
+				000000000000000000100020 /* NcmdumpService.swift in Sources */,
+				000000000000000000100022 /* ServiceError.swift in Sources */,
+				000000000000000000100024 /* PlatformDetector.swift in Sources */,
+				000000000000000000100026 /* FileUtil.swift in Sources */,
+				000000000000000000100051 /* AppDelegate.swift in Sources */,
+				000000000000000000100053 /* TaskListView.swift in Sources */,
+				000000000000000000100055 /* URLInputField.swift in Sources */,
+				000000000000000000100057 /* ProgressBar.swift in Sources */,
+				000000000000000000100061 /* MenuBarStateManager.swift in Sources */,
+				000000000000000000100063 /* MenuBarPopoverView.swift in Sources */,
+				000000000000000000100065 /* MusicLibraryStore.swift in Sources */,
+				000000000000000000100067 /* MetadataReader.swift in Sources */,
+				000000000000000000100069 /* AudioPlayerService.swift in Sources */,
+				00000000000000000010006B /* MusicLibraryView.swift in Sources */,
+				00000000000000000010006E /* TutorialView.swift in Sources */,
+				000000000000000000100071 /* IAPManager.swift in Sources */,
+				000000000000000000100073 /* ProPurchaseView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000100039 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		00000000000000000010003A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		000000000000000000100040 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		000000000000000000100041 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00000000000000000010003B /* Build configuration list for PBXProject "MusicConverter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000100039 /* Debug */,
+				00000000000000000010003A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00000000000000000010003C /* Build configuration list for PBXNativeTarget "MusicConverter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000100040 /* Debug */,
+				000000000000000000100041 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 000000000000000000100029 /* Project object */;
+}

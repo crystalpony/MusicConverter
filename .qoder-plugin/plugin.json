@@ -1,0 +1,15 @@
+{
+  "name": "music-downloader",
+  "displayName": "音乐下载 & MP3 转换",
+  "version": "0.2.0",
+  "description": "Download audio/video from mainstream platforms and convert to MP3 using yt-dlp; decrypt NetEase NCM files",
+  "descriptionZh": "使用 yt-dlp 从主流平台下载音视频并转换为 MP3 格式；支持网易云 NCM 加密文件解密",
+  "author": {
+    "name": "Qoder"
+  },
+  "logo": "./assets/avatar.svg",
+  "keywords": ["qoder-plugin", "skill", "music", "download", "mp3", "ncm", "netease", "yt-dlp", "ncmdump"],
+  "category": "media-tools",
+  "tags": ["skill"],
+  "skills": "./skills/"
+}

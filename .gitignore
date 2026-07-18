@@ -1,0 +1,23 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Swift
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+.AppleDouble
+._*
+
+# Python (生成脚本)
+__pycache__/
+*.pyc
+
+# CLI 二进制（不提交到 Git，通过脚本下载）
+MusicConverter/Resources/yt-dlp
+MusicConverter/Resources/ffmpeg
+MusicConverter/Resources/ncmdump
