@@ -17,10 +17,14 @@ enum PlatformDetector {
     /// yt-dlp 不支持的平台（DRM 等限制）
     private static let unsupportedPatterns: [(String, [String])] = [
         ("Apple Music", ["music\\.apple\\.com"]),
+        ("Spotify",    ["spotify\\.com"]),
+    ]
+
+    /// 条件支持的平台（有 Cookie 时可下载）
+    private static let conditionalPatterns: [(String, [String])] = [
         ("QQ音乐",     ["y\\.qq\\.com"]),
         ("酷狗音乐",   ["kugou\\.com"]),
         ("酷我音乐",   ["kuwo\\.cn"]),
-        ("Spotify",    ["spotify\\.com"]),
     ]
 
     static func detect(url: String) -> String {
@@ -40,6 +44,20 @@ enum PlatformDetector {
             for pat in pats {
                 if url.range(of: pat, options: .regularExpression) != nil {
                     return platform
+                }
+            }
+        }
+        return nil
+    }
+
+    /// 检查 URL 是否为条件支持的平台（需要 Cookie）
+    /// 返回平台名称；如果已有 Cookie 则返回 nil（表示可正常下载）
+    static func conditionalPlatform(url: String, hasCookie: Bool = false) -> String? {
+        for (platform, pats) in conditionalPatterns {
+            for pat in pats {
+                if url.range(of: pat, options: .regularExpression) != nil {
+                    // 有 Cookie 时允许下载
+                    return hasCookie ? nil : platform
                 }
             }
         }

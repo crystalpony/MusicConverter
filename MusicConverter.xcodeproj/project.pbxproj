@@ -43,6 +43,12 @@
 		00000000000000000010006E /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010006D /* TutorialView.swift */; };
 		000000000000000000100071 /* IAPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100070 /* IAPManager.swift */; };
 		000000000000000000100073 /* ProPurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100072 /* ProPurchaseView.swift */; };
+		000000000000000000100081 /* MusicPlatformAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100080 /* MusicPlatformAccount.swift */; };
+		000000000000000000100083 /* MusicPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100082 /* MusicPlatformService.swift */; };
+		000000000000000000100085 /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100084 /* PaymentService.swift */; };
+		000000000000000000100087 /* PlatformLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100086 /* PlatformLoginView.swift */; };
+		000000000000000000100089 /* PlaylistBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100088 /* PlaylistBrowserView.swift */; };
+		00000000000000000010008B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010008A /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +89,12 @@
 		00000000000000000010006D /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TutorialView.swift"; sourceTree = "<group>"; };
 		000000000000000000100070 /* IAPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IAPManager.swift"; sourceTree = "<group>"; };
 		000000000000000000100072 /* ProPurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProPurchaseView.swift"; sourceTree = "<group>"; };
+		000000000000000000100080 /* MusicPlatformAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicPlatformAccount.swift"; sourceTree = "<group>"; };
+		000000000000000000100082 /* MusicPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicPlatformService.swift"; sourceTree = "<group>"; };
+		000000000000000000100084 /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentService.swift"; sourceTree = "<group>"; };
+		000000000000000000100086 /* PlatformLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlatformLoginView.swift"; sourceTree = "<group>"; };
+		000000000000000000100088 /* PlaylistBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistBrowserView.swift"; sourceTree = "<group>"; };
+		00000000000000000010008A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +164,9 @@
 				00000000000000000010006A /* MusicLibraryView.swift */,
 				00000000000000000010006D /* TutorialView.swift */,
 				000000000000000000100072 /* ProPurchaseView.swift */,
+				000000000000000000100086 /* PlatformLoginView.swift */,
+				000000000000000000100088 /* PlaylistBrowserView.swift */,
+				00000000000000000010008A /* OnboardingView.swift */,
 			);
 			path = "Views";
 			sourceTree = "<group>";
@@ -175,6 +190,7 @@
 				000000000000000000100011 /* ConvertTask.swift */,
 				000000000000000000100013 /* NCMTask.swift */,
 				000000000000000000100015 /* AppSettings.swift */,
+				000000000000000000100080 /* MusicPlatformAccount.swift */,
 			);
 			path = "Models";
 			sourceTree = "<group>";
@@ -194,6 +210,8 @@
 				000000000000000000100066 /* MetadataReader.swift */,
 				000000000000000000100068 /* AudioPlayerService.swift */,
 				000000000000000000100070 /* IAPManager.swift */,
+				000000000000000000100082 /* MusicPlatformService.swift */,
+				000000000000000000100084 /* PaymentService.swift */,
 			);
 			path = "Services";
 			sourceTree = "<group>";
@@ -324,6 +342,12 @@
 				00000000000000000010006E /* TutorialView.swift in Sources */,
 				000000000000000000100071 /* IAPManager.swift in Sources */,
 				000000000000000000100073 /* ProPurchaseView.swift in Sources */,
+				000000000000000000100081 /* MusicPlatformAccount.swift in Sources */,
+				000000000000000000100083 /* MusicPlatformService.swift in Sources */,
+				000000000000000000100085 /* PaymentService.swift in Sources */,
+				000000000000000000100087 /* PlatformLoginView.swift in Sources */,
+				000000000000000000100089 /* PlaylistBrowserView.swift in Sources */,
+				00000000000000000010008B /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

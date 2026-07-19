@@ -6,6 +6,7 @@ struct MusicConverterApp: App {
     @StateObject private var settings = AppSettings()
     @StateObject private var activationManager = ActivationManager.shared
     @State private var showProPurchase: Bool = false
+    @State private var showOnboarding: Bool = false
 
     var body: some Scene {
         WindowGroup {
@@ -21,6 +22,10 @@ struct MusicConverterApp: App {
                     }
                     // 同步激活状态到 settings
                     settings.isPro = activationManager.isPro
+                    // 首次启动显示引导
+                    if !settings.hasCompletedOnboarding {
+                        showOnboarding = true
+                    }
                 }
                 .onReceive(activationManager.$isPro) { isPro in
                     settings.isPro = isPro
@@ -30,6 +35,10 @@ struct MusicConverterApp: App {
                 }
                 .sheet(isPresented: $showProPurchase) {
                     ProPurchaseView()
+                        .environmentObject(settings)
+                }
+                .sheet(isPresented: $showOnboarding) {
+                    OnboardingView()
                         .environmentObject(settings)
                 }
         }

@@ -63,6 +63,7 @@ extension DownloadTask: TaskListDisplayable {
         case .downloading, .converting: return .blue
         case .completed: return .green
         case .failed: return .red
+        case .skipped: return .orange
         }
     }
 }

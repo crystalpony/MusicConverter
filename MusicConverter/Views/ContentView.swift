@@ -15,23 +15,29 @@ struct ContentView: View {
                 }
                 .tag(0)
 
+            PlaylistBrowserView()
+                .tabItem {
+                    Label("歌单", systemImage: "music.note.list")
+                }
+                .tag(1)
+
             ConvertView()
                 .tabItem {
                     Label("转换", systemImage: "arrow.triangle.2.circlepath")
                 }
-                .tag(1)
+                .tag(2)
 
             NCMView()
                 .tabItem {
                     Label("NCM 解密", systemImage: "lock.open")
                 }
-                .tag(2)
+                .tag(3)
 
             MusicLibraryView()
                 .tabItem {
-                    Label("音乐库", systemImage: "music.note.list")
+                    Label("音乐库", systemImage: "square.stack.3d.up")
                 }
-                .tag(3)
+                .tag(4)
         }
         .padding()
         .toolbar {
@@ -48,7 +54,7 @@ struct ContentView: View {
             TutorialView(isPresented: $showTutorial)
         }
         .onReceive(NotificationCenter.default.publisher(for: .showMusicLibrary)) { _ in
-            selectedTab = 3
+            selectedTab = 4
         }
         .onAppear {
             if !hasShownTutorial {

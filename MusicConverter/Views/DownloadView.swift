@@ -112,6 +112,12 @@ struct DownloadView: View {
             logOutput += "[错误] 不支持 \(unsupported)：该平台有 DRM 保护，yt-dlp 无法下载\n"
             return
         }
+        // 条件支持平台检测（需要 Cookie）
+        let hasCookie = settings.effectiveCookieFilePath != nil
+        if let conditional = PlatformDetector.conditionalPlatform(url: cleanedURL, hasCookie: hasCookie) {
+            logOutput += "[提示] \(conditional) 需要先登录账号（在「歌单」Tab 扫码登录）或配置 Cookie 文件后才能下载\n"
+            return
+        }
         pendingURL = cleanedURL
         pendingPlatform = PlatformDetector.detect(url: cleanedURL)
         showFormatSheet = true
@@ -143,7 +149,7 @@ struct DownloadView: View {
                     outputDir: settings.resolvedOutputDirectory,
                     format: fmt,
                     bitrate: settings.defaultBitrate,
-                    cookieFile: settings.cookieFilePath.isEmpty ? nil : settings.cookieFilePath,
+                    cookieFile: settings.effectiveCookieFilePath,
                     proxy: settings.useProxy ? settings.proxyAddress : nil,
                     onProgress: { progress in
                         tasks[taskIndex].progress = progress
@@ -170,6 +176,7 @@ struct DownloadView: View {
         case .downloading, .converting: return .blue
         case .completed: return .green
         case .failed: return .red
+        case .skipped: return .orange
         }
     }
 }

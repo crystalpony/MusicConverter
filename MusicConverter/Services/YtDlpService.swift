@@ -168,6 +168,105 @@ class YtDlpService: ObservableObject {
         return (latest, FileUtil.stem(of: latest))
     }
 
+    // MARK: - 批量下载（v2.0 歌单批量）
+
+    /// 批量下载结果
+    struct BatchResult {
+        var completed: Int = 0
+        var failed: Int = 0
+        var skipped: Int = 0
+        var totalDuration: TimeInterval = 0  // 总下载耗时
+    }
+
+    /// 批量下载歌曲（串行队列）
+    /// - Parameters:
+    ///   - songs: 待下载的歌曲列表
+    ///   - outputDir: 输出目录
+    ///   - format: 下载格式
+    ///   - bitrate: 比特率
+    ///   - cookieFile: Cookie 文件路径
+    ///   - proxy: 代理地址
+    ///   - playlistName: 来源歌单名
+    ///   - onTaskUpdate: 每首歌状态更新回调（index, task）
+    ///   - onProgress: 整体进度回调（completedCount, totalCount）
+    /// - Returns: 批量下载结果
+    func batchDownload(
+        songs: [PlatformSong],
+        outputDir: String,
+        format: DownloadFormat = .audioMP3,
+        bitrate: String = "320k",
+        cookieFile: String? = nil,
+        proxy: String? = nil,
+        playlistName: String = "",
+        onTaskUpdate: @escaping (Int, DownloadTask) -> Void = { _, _ in },
+        onProgress: @escaping (Int, Int) -> Void = { _, _ in }
+    ) async -> BatchResult {
+        var result = BatchResult()
+        let startTime = Date()
+
+        for (index, song) in songs.enumerated() {
+            var task = DownloadTask(
+                url: song.downloadURL,
+                title: song.title,
+                platform: song.platform.rawValue,
+                status: .downloading,
+                bitrate: bitrate,
+                format: format.rawValue,
+                sourcePlaylist: playlistName,
+                artist: song.artist,
+                duration: song.duration,
+                sourcePlatform: song.platform.rawValue,
+                songId: song.id
+            )
+
+            onTaskUpdate(index, task)
+
+            do {
+                let downloadResult = try await download(
+                    url: song.downloadURL,
+                    outputDir: outputDir,
+                    format: format,
+                    bitrate: bitrate,
+                    cookieFile: cookieFile,
+                    proxy: proxy,
+                    onProgress: { progress in
+                        task.progress = progress
+                        onTaskUpdate(index, task)
+                    },
+                    onOutput: { _ in }
+                )
+
+                task.status = .completed
+                task.outputPath = downloadResult.path
+                task.title = downloadResult.title
+                result.completed += 1
+
+                // 入库到音乐库
+                MusicLibraryStore.shared.addRecord(
+                    filePath: downloadResult.path,
+                    sourceFileName: song.title
+                )
+
+            } catch {
+                // 判断是否为"已存在"跳过
+                if error.localizedDescription.contains("already exists") {
+                    task.status = .skipped
+                    result.skipped += 1
+                } else {
+                    task.status = .failed
+                    task.errorMessage = error.localizedDescription
+                    result.failed += 1
+                }
+            }
+
+            onTaskUpdate(index, task)
+            onProgress(result.completed + result.failed + result.skipped, songs.count)
+        }
+
+        result.totalDuration = Date().timeIntervalSince(startTime)
+        return result
+    }
+
     // MARK: - Helpers
 
     private func extractQuotedPath(from line: String) -> String? {

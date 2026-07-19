@@ -38,6 +38,11 @@ struct SettingsView: View {
                         chooseCookieFile()
                     }
                 }
+                Toggle("优先使用平台登录 Cookie", isOn: $settings.usePlatformCookies)
+            }
+
+            Section("音乐平台账号") {
+                PlatformLoginEntryView()
             }
 
             Section("快捷功能") {
@@ -68,7 +73,7 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 500, height: 400)
+        .frame(width: 500, height: 520)
     }
 
     private func chooseDirectory() {
