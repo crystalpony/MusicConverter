@@ -89,8 +89,8 @@ class VideoPlayerService: ObservableObject {
     private func addTimeObserver() {
         let interval = CMTime(seconds: 0.25, preferredTimescale: 600)
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            guard let self else { return }
             Task { @MainActor in
-                guard let self else { return }
                 self.currentTime = time.seconds
                 if let dur = self.player.currentItem?.duration.seconds, dur.isFinite {
                     self.duration = dur

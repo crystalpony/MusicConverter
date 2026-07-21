@@ -243,8 +243,9 @@ class AudioPlayerService: ObservableObject {
     private func startTimer() {
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            guard let self else { return }
             Task { @MainActor in
-                guard let self, let player = self.player else { return }
+                guard let player = self.player else { return }
                 self.currentTime = player.currentTime
             }
         }
