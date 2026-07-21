@@ -17,7 +17,4 @@ Package.resolved
 __pycache__/
 *.pyc
 
-# CLI 二进制（不提交到 Git，通过脚本下载）
-MusicConverter/Resources/yt-dlp
-MusicConverter/Resources/ffmpeg
-MusicConverter/Resources/ncmdump
+# CLI 二进制已纳入 Git（yt-dlp / ffmpeg / ncmdump），供 CI 构建打包 DMG
