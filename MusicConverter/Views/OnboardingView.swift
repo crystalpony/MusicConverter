@@ -3,6 +3,7 @@ import SwiftUI
 /// 首次启动引导页 - 3 步极简引导
 struct OnboardingView: View {
     @EnvironmentObject var settings: AppSettings
+    @Environment(\.dismiss) private var dismiss
     @State private var currentPage: Int = 0
     @State private var showLoginSheet: Bool = false
     @State private var animateIn: Bool = false
@@ -74,7 +75,7 @@ struct OnboardingView: View {
                 .scaleEffect(animateIn ? 1.0 : 0.6)
                 .opacity(animateIn ? 1.0 : 0)
 
-            Text("欢迎使用 MusicConverter")
+            Text("欢迎使用 Tunely")
                 .font(.title)
                 .fontWeight(.bold)
 
@@ -224,6 +225,7 @@ struct OnboardingView: View {
 
     private func completeOnboarding() {
         settings.hasCompletedOnboarding = true
+        dismiss()
     }
 }
 

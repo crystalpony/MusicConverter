@@ -1,12 +1,14 @@
 import AVFoundation
+import AppKit
 
-/// 音频文件 ID3 元数据读取器
+/// 音视频文件元数据读取器
 enum MetadataReader {
     struct Metadata {
         let title: String?
         let artist: String?
         let album: String?
         let duration: TimeInterval?
+        let artwork: Data?   // 封面原始数据（JPEG/PNG）
     }
 
     /// 读取音频文件的元数据（标题、艺人、专辑、时长）
@@ -89,12 +91,53 @@ enum MetadataReader {
             }
         }
 
+        // 4. 封面：优先内嵌（音频/视频），视频无内嵌时抽帧生成
+        var artwork = await loadEmbeddedArtwork(from: asset)
+        if artwork == nil,
+           MusicRecord.videoExtensions.contains(url.pathExtension.lowercased()) {
+            artwork = await generateVideoThumbnail(from: asset)
+        }
+
         return Metadata(
             title: clean(title),
             artist: clean(artist),
             album: clean(album),
-            duration: duration
+            duration: duration,
+            artwork: artwork
         )
+    }
+
+    // MARK: - 封面提取
+
+    /// 提取内嵌封面（通用 artwork + ID3/iTunes 图片）
+    private static func loadEmbeddedArtwork(from asset: AVURLAsset) async -> Data? {
+        if let common = try? await asset.load(.commonMetadata) {
+            for item in common where item.commonKey == .commonKeyArtwork {
+                if let data = try? await item.load(.dataValue), !data.isEmpty { return data }
+            }
+        }
+        if let formats = try? await asset.load(.availableMetadataFormats) {
+            for format in formats {
+                guard let items = try? await asset.loadMetadata(for: format) else { continue }
+                for item in items {
+                    guard item.identifier == .id3MetadataAttachedPicture
+                            || item.identifier == .iTunesMetadataCoverArt else { continue }
+                    if let data = try? await item.load(.dataValue), !data.isEmpty { return data }
+                }
+            }
+        }
+        return nil
+    }
+
+    /// 为视频抽帧生成缩略图（取第 1 秒处）
+    private static func generateVideoThumbnail(from asset: AVURLAsset) async -> Data? {
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: 640, height: 640)
+        let time = CMTime(seconds: 1, preferredTimescale: 600)
+        guard let (cgImage, _) = try? await generator.image(at: time) else { return nil }
+        let rep = NSBitmapImageRep(cgImage: cgImage)
+        return rep.representation(using: .jpeg, properties: [.compressionFactor: 0.8])
     }
 
     /// 清理空白字符，空字符串归为 nil

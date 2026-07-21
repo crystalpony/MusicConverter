@@ -32,52 +32,54 @@ struct TutorialView: View {
 
                     tutorialSection(
                         icon: "arrow.down.circle.fill",
-                        color: .blue,
+                        color: Bauhaus.blue,
                         title: "下载",
                         items: [
-                            "1. 复制音视频链接（支持 YouTube、Bilibili、网易云音乐等）",
+                            "1. 复制音视频链接或视频直链（YouTube、Bilibili、网易云，或 .mp4 直链）",
                             "2. 粘贴到输入框，点击「下载」",
-                            "3. 选择想要的音频格式（MP3 / FLAC / WAV 等）",
-                            "4. 等待下载完成，文件自动保存到输出目录",
+                            "3. 选择格式：仅音频 MP3 / 原画视频 / 最佳画质 MP4",
+                            "4. 完成后自动保存到输出目录，并收录到音乐库/影音",
+                            "❗ 暂不支持 BT / 磁力链接（magnet、.torrent）",
                         ]
                     )
 
                     tutorialSection(
                         icon: "arrow.triangle.2.circlepath.fill",
-                        color: .green,
-                        title: "格式转换",
+                        color: Bauhaus.yellow,
+                        title: "转换（音频格式 + NCM 解密）",
                         items: [
-                            "1. 将本地音频文件拖拽到虚线框内，或点击选择文件",
-                            "2. 支持 MP3、WAV、FLAC、AAC、OGG、M4A 等主流格式",
-                            "3. 自动转换为 MP3 格式，保存到输出目录",
+                            "1. 将音频或 .ncm 文件/文件夹拖入虚线框，或点击选择",
+                            "2. 音频（MP3/WAV/FLAC/AAC/OGG/M4A…）自动转为 MP3",
+                            "3. 网易云 .ncm 自动解密还原，支持拖入整个文件夹批量",
+                            "4. 结果自动收录到音乐库",
                         ]
                     )
 
                     tutorialSection(
-                        icon: "lock.open.fill",
-                        color: .orange,
-                        title: "NCM 解密",
+                        icon: "film.fill",
+                        color: Bauhaus.red,
+                        title: "影音",
                         items: [
-                            "1. 将网易云音乐 .ncm 加密文件拖拽到虚线框内",
-                            "2. 支持拖入整个文件夹批量解密",
-                            "3. 解密后自动转为标准音频格式",
+                            "• 下载的视频自动进入「影音」页",
+                            "• 点击即以复古电视框小窗播放",
+                            "• 支持播放/暂停、进度拖拽",
                         ]
                     )
 
                     tutorialSection(
-                        icon: "music.note.list.fill",
-                        color: .purple,
+                        icon: "music.note.list",
+                        color: Bauhaus.blue,
                         title: "音乐库",
                         items: [
                             "• 所有转换/下载完成的音乐自动收录到音乐库",
                             "• 支持搜索、排序、按艺人/专辑分组浏览",
-                            "• 点击播放按钮可直接试听",
+                            "• 点击播放按钮可直接试听（含音量/随机/循环）",
                         ]
                     )
 
                     tutorialSection(
                         icon: "menubar.rectangle",
-                        color: .gray,
+                        color: Bauhaus.inkSecondary,
                         title: "菜单栏快捷操作",
                         items: [
                             "• 在「设置」中开启菜单栏图标",
@@ -86,13 +88,14 @@ struct TutorialView: View {
                     )
 
                     tutorialSection(
-                        icon: "gearshape.fill",
-                        color: .secondary,
-                        title: "提示",
+                        icon: "key.fill",
+                        color: Bauhaus.yellow,
+                        title: "Cookie 与提示",
                         items: [
-                            "• 输出目录和比特率可在「设置」(⌘,) 中修改",
-                            "• 网易云/QQ音乐下载需配置 Cookie，详见设置页",
-                            "• 部分平台（如 Spotify）有 DRM 保护，无法下载",
+                            "• B 站会员/受限视频、或遇到 412：在设置开启「从浏览器读取 Cookie」，选已登录 B 站的浏览器",
+                            "• 网易云/QQ音乐可在「歌单」页登录，或在设置配置 Cookie 文件",
+                            "• 输出目录与比特率在设置 (⌘,) 中修改",
+                            "• 部分平台（Spotify / Apple Music）有 DRM 保护，无法下载",
                         ]
                     )
                 }

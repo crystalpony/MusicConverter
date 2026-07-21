@@ -35,7 +35,20 @@ enum PlatformDetector {
                 }
             }
         }
+        // 直接媒体文件直链（.mp4/.mkv 等）
+        if url.range(of: #"\.(mp4|mkv|webm|mov|avi|flv|m4v|ts|mp3|m4a|flac|wav|aac|ogg)(\?.*)?$"#,
+                     options: [.regularExpression, .caseInsensitive]) != nil {
+            return "直链视频"
+        }
         return "其他平台"
+    }
+
+    /// 是否为 BT / 磁力链接（当前下载引擎 yt-dlp 不支持）
+    static func isTorrentLink(_ raw: String) -> Bool {
+        let s = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if s.hasPrefix("magnet:") { return true }
+        if s.range(of: #"\.torrent(\?.*)?$"#, options: .regularExpression) != nil { return true }
+        return false
     }
 
     /// 检查 URL 是否为不支持的平台，返回平台名称；nil 表示未命中

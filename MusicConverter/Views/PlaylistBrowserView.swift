@@ -58,7 +58,7 @@ struct PlaylistBrowserView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .onChange(of: platformService.selectedPlatform) { _, _ in
+            .onChange(of: platformService.selectedPlatform) { _ in
                 selectedPlaylist = nil
                 selectedSongs = []
                 Task { await platformService.loadPlaylists() }
@@ -125,6 +125,8 @@ struct PlaylistBrowserView: View {
             }
         }
         .padding(.vertical, 8)
+        .frame(maxHeight: .infinity)
+        .background(Bauhaus.paper)
     }
 
     /// 当前登录账号（便捷访问）
@@ -141,11 +143,11 @@ struct PlaylistBrowserView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(playlist.name)
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                            .font(BauhausFont.title(18))
+                            .foregroundStyle(Bauhaus.ink)
                         Text("\(playlist.trackCount) 首 · 来自\(playlist.platform.rawValue)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(BauhausFont.body(12))
+                            .foregroundStyle(Bauhaus.inkSecondary)
                     }
                     Spacer()
 
@@ -221,20 +223,27 @@ struct PlaylistBrowserView: View {
                 // 未选择歌单
                 Spacer()
                 VStack(spacing: 12) {
-                    Image(systemName: "music.note.list")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
+                    ZStack {
+                        Rectangle().fill(Bauhaus.blue.opacity(0.2)).frame(width: 72, height: 72)
+                            .bauhausBorder(width: 3)
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 34))
+                            .foregroundStyle(Bauhaus.blue)
+                    }
                     Text("选择一个歌单开始浏览")
-                        .foregroundStyle(.secondary)
+                        .font(BauhausFont.heading(15))
+                        .foregroundStyle(Bauhaus.ink)
                     if account?.isLoggedIn != true {
                         Text("请先登录音乐平台账号")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+                            .font(BauhausFont.body(12))
+                            .foregroundStyle(Bauhaus.inkSecondary)
                     }
                 }
                 Spacer()
             }
         }
+        .frame(maxHeight: .infinity)
+        .background(Bauhaus.paper)
     }
 
     // MARK: - 批量下载
@@ -243,11 +252,18 @@ struct PlaylistBrowserView: View {
         let songsToDownload = platformService.currentSongs.filter { selectedSongs.contains($0.id) }
         guard !songsToDownload.isEmpty else { return }
 
-        // 免费版限制
-        if !settings.isPro && songsToDownload.count > settings.effectiveConvertLimit {
-            // 弹出 Pro 升级提示（通过通知触发）
-            NotificationCenter.default.post(name: .showProPurchase, object: nil)
-            return
+        // 免费版累计下载限制（试下载 5 首）
+        if !settings.isPro {
+            if settings.isDownloadLimitReached {
+                // 已达上限，弹出 Pro 升级提示
+                NotificationCenter.default.post(name: .showProPurchase, object: nil)
+                return
+            }
+            if songsToDownload.count > settings.remainingFreeDownloads {
+                // 本批次超出剩余配额，弹出 Pro 升级提示
+                NotificationCenter.default.post(name: .showProPurchase, object: nil)
+                return
+            }
         }
 
         isBatchDownloading = true
@@ -264,6 +280,7 @@ struct PlaylistBrowserView: View {
                 format: selectedFormat,
                 bitrate: settings.defaultBitrate,
                 cookieFile: cookieFile,
+                cookiesFromBrowser: settings.effectiveCookieBrowser,
                 proxy: settings.useProxy ? settings.proxyAddress : nil,
                 playlistName: playlistName,
                 onTaskUpdate: { index, task in
@@ -314,26 +331,30 @@ struct PlaylistRowView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
             } placeholder: {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.secondary.opacity(0.2))
+                Rectangle()
+                    .fill(Bauhaus.yellow.opacity(0.4))
                     .overlay {
                         Image(systemName: "music.note")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Bauhaus.ink)
                     }
             }
             .frame(width: 40, height: 40)
-            .cornerRadius(4)
+            .clipped()
+            .bauhausBorder(width: 2, cornerRadius: 2)
+            .bauhausHardShadow(x: 2, y: 2)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(playlist.name)
-                    .font(.body)
+                    .font(BauhausFont.body(13))
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Bauhaus.ink)
                     .lineLimit(1)
                 Text("\(playlist.trackCount) 首")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(BauhausFont.body(11))
+                    .foregroundStyle(Bauhaus.inkSecondary)
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 3)
     }
 }
 
@@ -347,11 +368,19 @@ struct SongRowView: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            // 勾选框
+            // 方形勾选框
             Button(action: onToggle) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                    .font(.body)
+                ZStack {
+                    Rectangle()
+                        .fill(isSelected ? Bauhaus.red : Color.clear)
+                        .frame(width: 18, height: 18)
+                        .bauhausBorder(width: 2, cornerRadius: 2)
+                    if isSelected {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                }
             }
             .buttonStyle(.plain)
             .disabled(isDownloading)
@@ -359,15 +388,16 @@ struct SongRowView: View {
             // 歌曲信息
             VStack(alignment: .leading, spacing: 2) {
                 Text(song.title)
-                    .font(.body)
+                    .font(BauhausFont.body(13))
+                    .foregroundStyle(Bauhaus.ink)
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     Text(song.artist)
                     Text("·")
                     Text(song.album)
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.inkSecondary)
                 .lineLimit(1)
             }
 
@@ -375,11 +405,11 @@ struct SongRowView: View {
 
             // 时长
             Text(song.formattedDuration)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.inkSecondary)
                 .monospacedDigit()
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 3)
         .contentShape(Rectangle())
         .onTapGesture(perform: onToggle)
     }

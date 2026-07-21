@@ -6,6 +6,15 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("外观") {
+                Picker("外观模式", selection: $settings.appearanceMode) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        Text(mode.label).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
             Section("输出设置") {
                 HStack {
                     TextField("输出目录", text: $settings.outputDirectory)
@@ -32,6 +41,16 @@ struct SettingsView: View {
             }
 
             Section("Cookie") {
+                Picker("从浏览器读取 Cookie", selection: $settings.cookieBrowser) {
+                    ForEach(AppSettings.cookieBrowserOptions, id: \.1) { label, value in
+                        Text(label).tag(value)
+                    }
+                }
+                if !settings.cookieBrowser.isEmpty {
+                    Text("下载时自动使用该浏览器的登录态（可下载 B 站会员/受限视频、解除 412）。推荐 Firefox/Chrome；Safari 受系统保护常读不到，需先在「系统设置 → 隐私与安全性 → 完全磁盘访问」给本 App 授权。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 HStack {
                     TextField("Cookie 文件路径（网易云/QQ音乐需要）", text: $settings.cookieFilePath)
                     Button("选择...") {

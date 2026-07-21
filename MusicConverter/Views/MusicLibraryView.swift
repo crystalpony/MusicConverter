@@ -24,7 +24,7 @@ struct MusicLibraryView: View {
     }
     
     private var filteredRecords: [MusicRecord] {
-        var records = library.records
+        var records = library.records.filter { !$0.isVideo }
         // 搜索过滤
         if !searchText.isEmpty {
             let query = searchText.lowercased()
@@ -51,9 +51,9 @@ struct MusicLibraryView: View {
         VStack(spacing: 0) {
             // 顶部工具栏
             toolbar
-            Divider()
-            
-            if library.records.isEmpty {
+            Rectangle().fill(Bauhaus.ink).frame(height: 2)
+
+            if filteredRecords.isEmpty {
                 emptyState
             } else if viewMode == .list {
                 listView
@@ -63,9 +63,14 @@ struct MusicLibraryView: View {
 
             // 底部播放条
             if player.currentRecordID != nil {
-                Divider()
+                Rectangle().fill(Bauhaus.ink).frame(height: 2)
                 playerBar
             }
+        }
+        .background(Bauhaus.paper)
+        .task {
+            // 进入音乐库时自动补回输出目录里尚未入库的音频（只增不删）
+            await library.importNewFiles(from: settings.resolvedOutputDirectory)
         }
     }
     
@@ -204,6 +209,13 @@ struct MusicLibraryView: View {
         let isCurrent = player.currentRecordID == record.id
         
         return HStack(spacing: 10) {
+            // 封面缩略图
+            CoverImageView(path: record.coverPath, fallbackIcon: "music.note",
+                           accent: isCurrent ? Bauhaus.red : Bauhaus.blue)
+                .frame(width: 40, height: 40)
+                .clipped()
+                .bauhausBorder(width: 1.5, cornerRadius: 2)
+
             // 播放按钮
             Button {
                 player.togglePlay(record, in: playlist)
@@ -289,31 +301,52 @@ struct MusicLibraryView: View {
     // MARK: - 底部播放条
 
     private var playerBar: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             // 正在播放信息
-            HStack(spacing: 8) {
-                Image(systemName: "music.note")
-                    .foregroundStyle(Color.accentColor)
+            HStack(spacing: 10) {
+                // 封面方块
+                ZStack {
+                    Rectangle().fill(Bauhaus.yellow)
+                    Image(systemName: "music.note")
+                        .foregroundStyle(Bauhaus.ink)
+                }
+                .frame(width: 34, height: 34)
+                .bauhausBorder(width: 2)
+
                 VStack(alignment: .leading, spacing: 1) {
                     Text(player.currentRecord?.displayTitle ?? "")
-                        .font(.subheadline)
+                        .font(BauhausFont.heading(13))
+                        .foregroundStyle(Bauhaus.ink)
                         .lineLimit(1)
                         .truncationMode(.middle)
                     if let artist = player.currentRecord?.artist, !artist.isEmpty {
                         Text(artist)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .font(BauhausFont.body(11))
+                            .foregroundStyle(Bauhaus.inkSecondary)
                             .lineLimit(1)
                     }
                 }
                 Spacer()
+
+                // 音量
+                HStack(spacing: 6) {
+                    Image(systemName: "speaker.fill")
+                        .font(.caption2)
+                        .foregroundStyle(Bauhaus.inkSecondary)
+                    Slider(value: Binding(
+                        get: { Double(player.volume) },
+                        set: { player.volume = Float($0) }
+                    ), in: 0...1)
+                    .frame(width: 90)
+                    .tint(Bauhaus.blue)
+                }
             }
 
             // 进度条
             HStack(spacing: 8) {
                 Text(formatDuration(isSeeking ? seekValue : player.currentTime))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(BauhausFont.body(11))
+                    .foregroundStyle(Bauhaus.inkSecondary)
                     .monospacedDigit()
                     .frame(width: 40, alignment: .trailing)
 
@@ -332,32 +365,48 @@ struct MusicLibraryView: View {
                         }
                     }
                 )
+                .tint(Bauhaus.red)
 
                 Text(formatDuration(player.duration))
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .font(BauhausFont.body(11))
+                    .foregroundStyle(Bauhaus.inkSecondary)
                     .monospacedDigit()
                     .frame(width: 40, alignment: .leading)
             }
 
             // 控制按钮
-            HStack(spacing: 28) {
+            HStack(spacing: 24) {
+                // 随机
+                Button {
+                    player.toggleShuffle()
+                } label: {
+                    Image(systemName: "shuffle")
+                        .font(.body)
+                        .foregroundStyle(player.isShuffle ? Bauhaus.red : Bauhaus.inkSecondary)
+                }
+                .buttonStyle(.plain)
+                .help(player.isShuffle ? "随机播放：开" : "随机播放：关")
+
                 Button {
                     player.playPrevious()
                 } label: {
                     Image(systemName: "backward.fill")
                         .font(.body)
+                        .foregroundStyle(player.hasPrevious ? Bauhaus.ink : Bauhaus.inkSecondary.opacity(0.4))
                 }
                 .buttonStyle(.plain)
                 .disabled(!player.hasPrevious)
-                .foregroundStyle(player.hasPrevious ? .primary : .tertiary)
 
+                // 播放/暂停（圆形硬边框）
                 Button {
                     player.togglePlayPause()
                 } label: {
-                    Image(systemName: player.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(Color.accentColor)
+                    Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.body)
+                        .foregroundStyle(Bauhaus.ink)
+                        .frame(width: 38, height: 38)
+                        .background(Circle().fill(Bauhaus.yellow))
+                        .bauhausBorder(width: 2, cornerRadius: 19)
                 }
                 .buttonStyle(.plain)
 
@@ -366,15 +415,26 @@ struct MusicLibraryView: View {
                 } label: {
                     Image(systemName: "forward.fill")
                         .font(.body)
+                        .foregroundStyle(player.hasNext ? Bauhaus.ink : Bauhaus.inkSecondary.opacity(0.4))
                 }
                 .buttonStyle(.plain)
                 .disabled(!player.hasNext)
-                .foregroundStyle(player.hasNext ? .primary : .tertiary)
+
+                // 循环模式
+                Button {
+                    player.cycleRepeatMode()
+                } label: {
+                    Image(systemName: player.repeatMode.icon)
+                        .font(.body)
+                        .foregroundStyle(player.repeatMode == .off ? Bauhaus.inkSecondary : Bauhaus.blue)
+                }
+                .buttonStyle(.plain)
+                .help(player.repeatMode.rawValue)
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .padding(.vertical, 12)
+        .background(Bauhaus.surface)
     }
 
     // MARK: - Helpers

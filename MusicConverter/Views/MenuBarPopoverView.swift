@@ -392,4 +392,7 @@ struct MenuBarPopoverView: View {
 extension Notification.Name {
     static let showMusicLibrary = Notification.Name("showMusicLibrary")
     static let showProPurchase = Notification.Name("showProPurchase")
+    static let showDownload = Notification.Name("showDownload")
+    static let showVideoLibrary = Notification.Name("showVideoLibrary")
+    static let showAbout = Notification.Name("showAbout")
 }

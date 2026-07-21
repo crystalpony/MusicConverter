@@ -18,15 +18,17 @@ enum DownloadFormat: String, CaseIterable {
                 "--add-metadata",
             ]
         case .originalVideo:
-            // 保持源格式，嵌入字幕和缩略图
+            // 保持源格式，但优先 H.264 视频流（避免 AV1/VP9 导致 macOS 无画面）
             return [
+                "-S", "vcodec:h264,res,acodec:aac",
                 "--write-subs", "--write-auto-subs", "--sub-langs", "all",
                 "--embed-thumbnail", "--embed-metadata",
             ]
         case .bestVideo:
-            // 最佳画质 + 最佳音质，合并为 mp4
+            // 最佳画质 + 最佳音质，合并为 mp4；优先 H.264+AAC 以确保 macOS AVPlayer 可播放
             return [
                 "-f", "bv*+ba/b",
+                "-S", "vcodec:h264,res,acodec:aac",
                 "--merge-output-format", "mp4",
                 "--embed-thumbnail", "--embed-metadata",
                 "--write-subs", "--write-auto-subs", "--sub-langs", "all",
@@ -42,6 +44,21 @@ enum DownloadFormat: String, CaseIterable {
         case .bestVideo:     return ["mp4", "mkv", "webm"]
         }
     }
+
+    /// 下载弹窗中的排序（推荐项靠前）
+    static let downloadMenuOrder: [DownloadFormat] = [.bestVideo, .audioMP3, .originalVideo]
+
+    /// 弹窗按钮标题（含推荐/风险说明）
+    var dialogLabel: String {
+        switch self {
+        case .bestVideo:     return "视频 MP4（推荐 · 本机可播放）"
+        case .audioMP3:      return "仅音频 MP3（只要声音选这个）"
+        case .originalVideo: return "原画视频 · 原格式（高清，可能无法在本机播放）"
+        }
+    }
+
+    /// 是否为视频格式
+    var isVideo: Bool { self != .audioMP3 }
 }
 
 /// yt-dlp 下载服务
@@ -50,6 +67,9 @@ class YtDlpService: ObservableObject {
     private let runner = ProcessRunner()
     private let toolManager = ToolManager.shared
 
+    /// 模拟桌面 Chrome 的 User-Agent，用于绕过部分站点的基础风控
+    static let browserUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+
     /// 下载 URL 并按指定格式保存
     func download(
         url rawURL: String,
@@ -57,6 +77,7 @@ class YtDlpService: ObservableObject {
         format: DownloadFormat = .audioMP3,
         bitrate: String = "320k",
         cookieFile: String? = nil,
+        cookiesFromBrowser: String? = nil,
         proxy: String? = nil,
         onProgress: @escaping (Double) -> Void = { _ in },
         onOutput: @escaping (String) -> Void = { _ in }
@@ -85,15 +106,28 @@ class YtDlpService: ObservableObject {
             "--no-warnings",
             "--newline",
             "--no-colors",
+            // 模拟浏览器 UA，避免部分站点（如 B 站）风控拦截导致 HTTP 412
+            "--user-agent", Self.browserUserAgent,
+            // 网络波动/风控时自动重试
+            "--retries", "10",
+            "--extractor-retries", "3",
         ]
 
-        // Bilibili 特殊处理
+        // Bilibili 特殊处理：Referer + 请求限速，缓解 412 Precondition Failed 风控
         if platform == "Bilibili" {
-            args += ["--referer", "https://www.bilibili.com"]
+            args += [
+                "--referer", "https://www.bilibili.com",
+                "--add-header", "Origin:https://www.bilibili.com",
+                "--sleep-requests", "1",
+            ]
         }
 
         if let cookieFile = cookieFile, !cookieFile.isEmpty {
             args += ["--cookies", cookieFile]
+        }
+        // 从浏览器直接读取登录 Cookie（根治 B 站 412 / 会员受限内容）
+        if let cookiesFromBrowser = cookiesFromBrowser, !cookiesFromBrowser.isEmpty {
+            args += ["--cookies-from-browser", cookiesFromBrowser]
         }
         if let proxy = proxy, !proxy.isEmpty {
             args += ["--proxy", proxy]
@@ -103,10 +137,17 @@ class YtDlpService: ObservableObject {
 
         // 运行 yt-dlp，实时捕获 stdout 解析进度和最终路径
         var lastMergedPath: String?
+        var cookieAccessDenied = false
         let stream = runner.run(launchPath: ytdlp, arguments: args)
 
         for await line in stream {
             onOutput(line)
+
+            // 浏览器 Cookie 读取被系统拒绝（常见于 Safari 的 binarycookies 受 TCC 保护）
+            if line.contains("binarycookies")
+                || (line.contains("Operation not permitted") && line.range(of: "cookies", options: .caseInsensitive) != nil) {
+                cookieAccessDenied = true
+            }
 
             // 进度: [download]  45.2% of ...
             if let range = line.range(of: #"\[download\]\s+([\d.]+)%"#, options: .regularExpression) {
@@ -144,6 +185,9 @@ class YtDlpService: ObservableObject {
 
         let exitCode = await runner.waitUntilExit()
         guard exitCode == 0 else {
+            if cookieAccessDenied {
+                throw ServiceError.cookieAccessDenied
+            }
             throw ServiceError.processFailed("yt-dlp", exitCode)
         }
 
@@ -196,6 +240,7 @@ class YtDlpService: ObservableObject {
         format: DownloadFormat = .audioMP3,
         bitrate: String = "320k",
         cookieFile: String? = nil,
+        cookiesFromBrowser: String? = nil,
         proxy: String? = nil,
         playlistName: String = "",
         onTaskUpdate: @escaping (Int, DownloadTask) -> Void = { _, _ in },
@@ -228,6 +273,7 @@ class YtDlpService: ObservableObject {
                     format: format,
                     bitrate: bitrate,
                     cookieFile: cookieFile,
+                    cookiesFromBrowser: cookiesFromBrowser,
                     proxy: proxy,
                     onProgress: { progress in
                         task.progress = progress

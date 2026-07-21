@@ -37,7 +37,7 @@ class PaymentService: ObservableObject {
     private static let apiBaseURL = "https://musicconverter-pay.crystalpony.workers.dev"
 
     /// Pro 定价（元）
-    static let proPrice: Double = 29.9
+    static let proPrice: Double = 5.9
 
     /// 原价（用于展示划线价）
     static let originalPrice: Double = 49.9

@@ -5,16 +5,16 @@ struct ProPurchaseView: View {
     @EnvironmentObject var settings: AppSettings
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var activation = ActivationManager.shared
-    @ObservedObject private var paymentService = PaymentService.shared
 
     @State private var inputCode: String = ""
     @State private var eggMessage: String?
     @State private var showManualEntry: Bool = false
-    @State private var isCreatingOrder: Bool = false
-    @State private var showPayQRCode: Bool = false
 
     /// 隐藏彩蛋暗号：输入后免费赠送一次转换机会
     private static let secretPassphrase = "夏家驹真帅"
+
+    /// 官网购买页地址（部署后替换为正式域名）
+    private static let purchaseURLString = "https://music-converter-web.vercel.app/purchase"
 
     var body: some View {
         VStack(spacing: 20) {
@@ -22,7 +22,6 @@ struct ProPurchaseView: View {
             HStack {
                 Spacer()
                 Button {
-                    paymentService.stopPolling()
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -79,7 +78,7 @@ struct ProPurchaseView: View {
                         Text("购买提醒")
                             .font(.caption)
                             .fontWeight(.medium)
-                        Text("免费版每次最多转换 \(settings.effectiveConvertLimit) 个文件，升级 Pro 后可无限制批量转换、歌单下载。")
+                        Text("免费版每次最多转换 \(settings.effectiveConvertLimit) 个文件、试下载 \(AppSettings.freeDownloadLimit) 首歌，升级 Pro 后可无限制批量转换、歌单下载。")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -95,7 +94,7 @@ struct ProPurchaseView: View {
             // 功能列表
             VStack(alignment: .leading, spacing: 10) {
                 featureRow(icon: "infinity", text: "无限制批量转换", detail: "免费版每次最多 3 个文件")
-                featureRow(icon: "music.note.list", text: "歌单批量下载", detail: "一键备份网易云/QQ音乐歌单")
+                featureRow(icon: "music.note.list", text: "歌单批量下载", detail: "免费版试下载 \(AppSettings.freeDownloadLimit) 首，Pro 无限制")
                 featureRow(icon: "sparkles", text: "优先获取新功能", detail: "未来新功能优先向 Pro 用户开放")
                 featureRow(icon: "heart", text: "支持独立开发者", detail: "感谢你的支持，让项目持续更新")
             }
@@ -112,49 +111,32 @@ struct ProPurchaseView: View {
 
             Spacer()
 
-            // 在线购买按钮（主 CTA）
+            // 前往官网购买（主 CTA）
             if !settings.isPro {
                 Button {
-                    startOnlinePurchase()
+                    openPurchasePage()
                 } label: {
                     HStack {
-                        if isCreatingOrder {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                        } else {
-                            Image(systemName: "qrcode")
-                        }
-                        Text(isCreatingOrder ? "创建订单中..." : "立即扫码购买")
+                        Image(systemName: "safari")
+                        Text("前往购买页面")
                     }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .tint(.orange)
-                .disabled(isCreatingOrder || paymentService.isPolling)
                 .padding(.horizontal, 32)
 
-                // 轮询状态提示
-                if paymentService.isPolling {
-                    HStack(spacing: 6) {
-                        ProgressView()
-                            .scaleEffect(0.7)
-                        Text("等待支付确认...")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                // 购买指引
+                VStack(alignment: .leading, spacing: 6) {
+                    purchaseStep(number: "1", text: "点击上方按钮打开购买页面，扫码支付")
+                    purchaseStep(number: "2", text: "在页面粘贴下方「本机识别码」，生成激活码")
+                    purchaseStep(number: "3", text: "复制激活码，回到 App 手动输入激活")
                 }
-
-                // 错误提示
-                if let error = paymentService.errorMessage {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 32)
-                }
+                .padding(.horizontal, 40)
 
                 // 手动激活码入口
-                Button(showManualEntry ? "收起手动激活" : "已有激活码？手动输入") {
+                Button(showManualEntry ? "收起激活码输入" : "已获取激活码？点此输入") {
                     withAnimation { showManualEntry.toggle() }
                 }
                 .font(.caption)
@@ -193,19 +175,16 @@ struct ProPurchaseView: View {
             .foregroundStyle(.secondary)
             .padding(.horizontal, 32)
 
-            Text("付款后自动获取激活码，无需等待人工处理")
+            Text("在购买页输入本机识别码即可即时获取激活码")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 16)
         }
         .frame(width: 440, height: 700)
-        .onChange(of: activation.isPro) { _, isPro in
+        .onChange(of: activation.isPro) { isPro in
             if isPro {
                 settings.isPro = true
             }
-        }
-        .sheet(isPresented: $showPayQRCode) {
-            PayQRCodeSheet()
         }
     }
 
@@ -253,28 +232,29 @@ struct ProPurchaseView: View {
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
 
-    // MARK: - 在线购买
+    // MARK: - 前往官网购买
 
-    private func startOnlinePurchase() {
-        isCreatingOrder = true
-        paymentService.errorMessage = nil
+    private func openPurchasePage() {
+        let machine = activation.machineCode
+        let encoded = machine.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? machine
+        let urlString = "\(Self.purchaseURLString)?machine=\(encoded)"
+        if let url = URL(string: urlString) {
+            NSWorkspace.shared.open(url)
+        }
+    }
 
-        Task {
-            do {
-                let order = try await paymentService.createOrder(machineCode: activation.machineCode)
-                isCreatingOrder = false
-                showPayQRCode = true
-
-                // 开始轮询
-                paymentService.startPolling(orderId: order.id, machineCode: activation.machineCode) { code in
-                    // 支付成功，自动激活
-                    activation.activate(code: code)
-                    showPayQRCode = false
-                }
-            } catch {
-                isCreatingOrder = false
-                paymentService.errorMessage = error.localizedDescription
-            }
+    private func purchaseStep(number: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(number)
+                .font(.caption2)
+                .fontWeight(.bold)
+                .frame(width: 18, height: 18)
+                .background(Color.orange.opacity(0.15))
+                .clipShape(Circle())
+            Text(text)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
         }
     }
 
@@ -317,97 +297,5 @@ struct StatBadge: View {
         .padding(.vertical, 8)
         .background(Color.orange.opacity(0.08))
         .cornerRadius(8)
-    }
-}
-
-// MARK: - 支付二维码弹窗
-
-struct PayQRCodeSheet: View {
-    @ObservedObject private var paymentService = PaymentService.shared
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("扫码支付")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Text("¥\(String(format: "%.1f", PaymentService.proPrice))")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.orange)
-
-            // 二维码区域
-            if let payURL = paymentService.currentOrder?.payURL {
-                // 使用系统生成二维码
-                QRCodeView(content: payURL)
-                    .frame(width: 200, height: 200)
-
-                Text("请使用微信或支付宝扫码")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                ProgressView("生成二维码中...")
-                    .frame(width: 200, height: 200)
-            }
-
-            // 状态
-            if paymentService.isPolling {
-                HStack(spacing: 6) {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                    Text("等待支付...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Button("取消支付") {
-                paymentService.stopPolling()
-                dismiss()
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-        }
-        .padding(32)
-        .frame(width: 320)
-    }
-}
-
-// MARK: - 二维码生成视图
-
-struct QRCodeView: View {
-    let content: String
-
-    var body: some View {
-        if let image = generateQRCode(from: content) {
-            Image(nsImage: image)
-                .interpolation(.none)
-                .resizable()
-                .scaledToFit()
-        } else {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.secondary.opacity(0.1))
-                .overlay {
-                    Image(systemName: "qrcode")
-                        .font(.largeTitle)
-                        .foregroundStyle(.secondary)
-                }
-        }
-    }
-
-    private func generateQRCode(from string: String) -> NSImage? {
-        guard let data = string.data(using: .utf8),
-              let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
-        filter.setValue(data, forKey: "inputMessage")
-        filter.setValue("M", forKey: "inputCorrectionLevel")
-
-        guard let ciImage = filter.outputImage else { return nil }
-        let scale = 200.0 / ciImage.extent.size.width
-        let scaledImage = ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
-        let rep = NSCIImageRep(ciImage: scaledImage)
-        let nsImage = NSImage(size: rep.size)
-        nsImage.addRepresentation(rep)
-        return nsImage
     }
 }

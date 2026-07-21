@@ -11,6 +11,39 @@ class AudioPlayerService: ObservableObject {
     @Published var currentTime: TimeInterval = 0
     @Published var duration: TimeInterval = 0
 
+    /// 音量（0...1）
+    @Published var volume: Float = 0.8 {
+        didSet { player?.volume = volume }
+    }
+    /// 随机播放
+    @Published var isShuffle: Bool = false
+    /// 循环模式
+    @Published var repeatMode: RepeatMode = .off
+
+    /// 循环模式
+    enum RepeatMode: String {
+        case off  = "顺序播放"
+        case one  = "单曲循环"
+        case all  = "列表循环"
+
+        var icon: String {
+            switch self {
+            case .off: return "repeat"
+            case .one: return "repeat.1"
+            case .all: return "repeat"
+            }
+        }
+
+        /// 切换到下一个模式：off -> all -> one -> off
+        var next: RepeatMode {
+            switch self {
+            case .off: return .all
+            case .all: return .one
+            case .one: return .off
+            }
+        }
+    }
+
     private var player: AVAudioPlayer?
     private var timer: Timer?
     private var playerDelegate: PlayerDelegate?
@@ -31,12 +64,14 @@ class AudioPlayerService: ObservableObject {
     /// 是否有下一首
     var hasNext: Bool {
         guard let idx = currentIndex else { return false }
+        if isShuffle || repeatMode == .all { return playlist.count > 1 }
         return idx < playlist.count - 1
     }
 
     /// 是否有上一首
     var hasPrevious: Bool {
         guard let idx = currentIndex else { return false }
+        if isShuffle || repeatMode == .all { return playlist.count > 1 }
         return idx > 0
     }
 
@@ -85,6 +120,7 @@ class AudioPlayerService: ObservableObject {
             }
             newPlayer.delegate = delegate
             newPlayer.prepareToPlay()
+            newPlayer.volume = volume
             newPlayer.play()
 
             player = newPlayer
@@ -137,21 +173,60 @@ class AudioPlayerService: ObservableObject {
 
     /// 播放下一首
     func playNext() {
-        guard let idx = currentIndex, idx < playlist.count - 1 else { return }
-        play(playlist[idx + 1])
+        guard let next = nextIndex() else { return }
+        play(playlist[next])
     }
 
     /// 播放上一首
     func playPrevious() {
-        guard let idx = currentIndex, idx > 0 else { return }
-        play(playlist[idx - 1])
+        guard let idx = currentIndex, !playlist.isEmpty else { return }
+        if isShuffle {
+            if let r = randomIndex(excluding: idx) { play(playlist[r]) }
+            return
+        }
+        if idx > 0 {
+            play(playlist[idx - 1])
+        } else if repeatMode == .all {
+            play(playlist[playlist.count - 1])
+        }
+    }
+
+    /// 切换随机播放
+    func toggleShuffle() {
+        isShuffle.toggle()
+    }
+
+    /// 循环下一个模式
+    func cycleRepeatMode() {
+        repeatMode = repeatMode.next
     }
 
     // MARK: - 内部
 
+    /// 计算下一首索引（考虑随机/列表循环）
+    private func nextIndex() -> Int? {
+        guard let idx = currentIndex, !playlist.isEmpty else { return nil }
+        if isShuffle { return randomIndex(excluding: idx) }
+        if idx < playlist.count - 1 { return idx + 1 }
+        if repeatMode == .all { return 0 }
+        return nil
+    }
+
+    /// 随机一个不同于当前的索引
+    private func randomIndex(excluding idx: Int) -> Int? {
+        guard playlist.count > 1 else { return nil }
+        var r = idx
+        while r == idx { r = Int.random(in: 0..<playlist.count) }
+        return r
+    }
+
     private func handlePlaybackFinished() {
-        if hasNext {
-            playNext()
+        if repeatMode == .one, let record = currentRecord {
+            play(record)
+            return
+        }
+        if let next = nextIndex() {
+            play(playlist[next])
         } else {
             stop()
         }

@@ -11,12 +11,10 @@
 		000000000000000000100004 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100003 /* ContentView.swift */; };
 		000000000000000000100006 /* DownloadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100005 /* DownloadView.swift */; };
 		000000000000000000100008 /* ConvertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100007 /* ConvertView.swift */; };
-		00000000000000000010000A /* NCMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100009 /* NCMView.swift */; };
 		00000000000000000010000C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000B /* SettingsView.swift */; };
 		00000000000000000010000E /* FileDropZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000D /* FileDropZone.swift */; };
 		000000000000000000100010 /* DownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010000F /* DownloadTask.swift */; };
 		000000000000000000100012 /* ConvertTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100011 /* ConvertTask.swift */; };
-		000000000000000000100014 /* NCMTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100013 /* NCMTask.swift */; };
 		000000000000000000100016 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100015 /* AppSettings.swift */; };
 		000000000000000000100018 /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100017 /* ToolManager.swift */; };
 		00000000000000000010001A /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100019 /* ProcessRunner.swift */; };
@@ -28,9 +26,6 @@
 		000000000000000000100026 /* FileUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100025 /* FileUtil.swift */; };
 		000000000000000000100028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100027 /* Assets.xcassets */; };
 		000000000000000000100051 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100050 /* AppDelegate.swift */; };
-		000000000000000000100053 /* TaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100052 /* TaskListView.swift */; };
-		000000000000000000100055 /* URLInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100054 /* URLInputField.swift */; };
-		000000000000000000100057 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100056 /* ProgressBar.swift */; };
 		000000000000000000100059 /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100058 /* ffmpeg */; };
 		00000000000000000010005B /* ncmdump in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005A /* ncmdump */; };
 		00000000000000000010005D /* yt-dlp in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005C /* yt-dlp */; };
@@ -49,6 +44,10 @@
 		000000000000000000100087 /* PlatformLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100086 /* PlatformLoginView.swift */; };
 		000000000000000000100089 /* PlaylistBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100088 /* PlaylistBrowserView.swift */; };
 		00000000000000000010008B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010008A /* OnboardingView.swift */; };
+		000000000000000000100091 /* BauhausTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100090 /* BauhausTheme.swift */; };
+		000000000000000000100093 /* VideoPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100092 /* VideoPlayerService.swift */; };
+		000000000000000000100095 /* VideoLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100094 /* VideoLibraryView.swift */; };
+		000000000000000000100098 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100097 /* AboutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,12 +55,10 @@
 		000000000000000000100003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
 		000000000000000000100005 /* DownloadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadView.swift"; sourceTree = "<group>"; };
 		000000000000000000100007 /* ConvertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConvertView.swift"; sourceTree = "<group>"; };
-		000000000000000000100009 /* NCMView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMView.swift"; sourceTree = "<group>"; };
 		00000000000000000010000B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
 		00000000000000000010000D /* FileDropZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileDropZone.swift"; sourceTree = "<group>"; };
 		00000000000000000010000F /* DownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadTask.swift"; sourceTree = "<group>"; };
 		000000000000000000100011 /* ConvertTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConvertTask.swift"; sourceTree = "<group>"; };
-		000000000000000000100013 /* NCMTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMTask.swift"; sourceTree = "<group>"; };
 		000000000000000000100015 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSettings.swift"; sourceTree = "<group>"; };
 		000000000000000000100017 /* ToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolManager.swift"; sourceTree = "<group>"; };
 		000000000000000000100019 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessRunner.swift"; sourceTree = "<group>"; };
@@ -74,9 +71,6 @@
 		000000000000000000100027 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		000000000000000000100038 /* MusicConverter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicConverter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000100050 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate.swift"; sourceTree = "<group>"; };
-		000000000000000000100052 /* TaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskListView.swift"; sourceTree = "<group>"; };
-		000000000000000000100054 /* URLInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLInputField.swift"; sourceTree = "<group>"; };
-		000000000000000000100056 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProgressBar.swift"; sourceTree = "<group>"; };
 		000000000000000000100058 /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ffmpeg"; sourceTree = "<group>"; };
 		00000000000000000010005A /* ncmdump */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ncmdump"; sourceTree = "<group>"; };
 		00000000000000000010005C /* yt-dlp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "yt-dlp"; sourceTree = "<group>"; };
@@ -95,6 +89,10 @@
 		000000000000000000100086 /* PlatformLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlatformLoginView.swift"; sourceTree = "<group>"; };
 		000000000000000000100088 /* PlaylistBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistBrowserView.swift"; sourceTree = "<group>"; };
 		00000000000000000010008A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingView.swift"; sourceTree = "<group>"; };
+		000000000000000000100090 /* BauhausTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BauhausTheme.swift"; sourceTree = "<group>"; };
+		000000000000000000100092 /* VideoPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoPlayerService.swift"; sourceTree = "<group>"; };
+		000000000000000000100094 /* VideoLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VideoLibraryView.swift"; sourceTree = "<group>"; };
+		000000000000000000100097 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AboutView.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,14 +152,15 @@
 			isa = PBXGroup;
 			children = (
 				00000000000000000010002F /* Components */,
+				000000000000000000100096 /* Theme */,
 				000000000000000000100003 /* ContentView.swift */,
 				000000000000000000100005 /* DownloadView.swift */,
 				000000000000000000100007 /* ConvertView.swift */,
-				000000000000000000100009 /* NCMView.swift */,
-				000000000000000000100052 /* TaskListView.swift */,
 				00000000000000000010000B /* SettingsView.swift */,
 				000000000000000000100062 /* MenuBarPopoverView.swift */,
 				00000000000000000010006A /* MusicLibraryView.swift */,
+				000000000000000000100094 /* VideoLibraryView.swift */,
+				000000000000000000100097 /* AboutView.swift */,
 				00000000000000000010006D /* TutorialView.swift */,
 				000000000000000000100072 /* ProPurchaseView.swift */,
 				000000000000000000100086 /* PlatformLoginView.swift */,
@@ -172,12 +171,19 @@
 			sourceTree = "<group>";
 		};
 
+		000000000000000000100096 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000100090 /* BauhausTheme.swift */,
+			);
+			path = "Theme";
+			sourceTree = "<group>";
+		};
+
 		00000000000000000010002F /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				00000000000000000010000D /* FileDropZone.swift */,
-				000000000000000000100054 /* URLInputField.swift */,
-				000000000000000000100056 /* ProgressBar.swift */,
 			);
 			path = "Components";
 			sourceTree = "<group>";
@@ -188,7 +194,6 @@
 			children = (
 				00000000000000000010000F /* DownloadTask.swift */,
 				000000000000000000100011 /* ConvertTask.swift */,
-				000000000000000000100013 /* NCMTask.swift */,
 				000000000000000000100015 /* AppSettings.swift */,
 				000000000000000000100080 /* MusicPlatformAccount.swift */,
 			);
@@ -209,6 +214,7 @@
 				000000000000000000100064 /* MusicLibraryStore.swift */,
 				000000000000000000100066 /* MetadataReader.swift */,
 				000000000000000000100068 /* AudioPlayerService.swift */,
+				000000000000000000100092 /* VideoPlayerService.swift */,
 				000000000000000000100070 /* IAPManager.swift */,
 				000000000000000000100082 /* MusicPlatformService.swift */,
 				000000000000000000100084 /* PaymentService.swift */,
@@ -314,12 +320,10 @@
 				000000000000000000100004 /* ContentView.swift in Sources */,
 				000000000000000000100006 /* DownloadView.swift in Sources */,
 				000000000000000000100008 /* ConvertView.swift in Sources */,
-				00000000000000000010000A /* NCMView.swift in Sources */,
 				00000000000000000010000C /* SettingsView.swift in Sources */,
 				00000000000000000010000E /* FileDropZone.swift in Sources */,
 				000000000000000000100010 /* DownloadTask.swift in Sources */,
 				000000000000000000100012 /* ConvertTask.swift in Sources */,
-				000000000000000000100014 /* NCMTask.swift in Sources */,
 				000000000000000000100016 /* AppSettings.swift in Sources */,
 				000000000000000000100018 /* ToolManager.swift in Sources */,
 				00000000000000000010001A /* ProcessRunner.swift in Sources */,
@@ -330,9 +334,6 @@
 				000000000000000000100024 /* PlatformDetector.swift in Sources */,
 				000000000000000000100026 /* FileUtil.swift in Sources */,
 				000000000000000000100051 /* AppDelegate.swift in Sources */,
-				000000000000000000100053 /* TaskListView.swift in Sources */,
-				000000000000000000100055 /* URLInputField.swift in Sources */,
-				000000000000000000100057 /* ProgressBar.swift in Sources */,
 				000000000000000000100061 /* MenuBarStateManager.swift in Sources */,
 				000000000000000000100063 /* MenuBarPopoverView.swift in Sources */,
 				000000000000000000100065 /* MusicLibraryStore.swift in Sources */,
@@ -348,6 +349,10 @@
 				000000000000000000100087 /* PlatformLoginView.swift in Sources */,
 				000000000000000000100089 /* PlaylistBrowserView.swift in Sources */,
 				00000000000000000010008B /* OnboardingView.swift in Sources */,
+				000000000000000000100091 /* BauhausTheme.swift in Sources */,
+				000000000000000000100093 /* VideoPlayerService.swift in Sources */,
+				000000000000000000100095 /* VideoLibraryView.swift in Sources */,
+				000000000000000000100098 /* AboutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +425,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tunely;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -441,6 +447,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tunely;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
