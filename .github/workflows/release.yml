@@ -1,0 +1,41 @@
+name: Build & Upload DMG
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-dmg:
+    runs-on: macos-14
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Universal Binary
+        run: |
+          xcodebuild -project MusicConverter.xcodeproj \
+            -scheme MusicConverter \
+            -configuration Release \
+            -arch arm64 -arch x86_64 \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: Sign (ad-hoc)
+        run: |
+          APP_PATH=$(find build -name "Tunely.app" -type d | head -1)
+          codesign --force --deep --sign - "$APP_PATH"
+
+      - name: Package DMG
+        run: |
+          APP_PATH=$(find build -name "Tunely.app" -type d | head -1)
+          mkdir dmg_temp
+          cp -R "$APP_PATH" dmg_temp/
+          ln -s /Applications dmg_temp/Applications
+          hdiutil create -volname "Tunely" -srcfolder dmg_temp -ov -format UDZO "Tunely-${{ github.ref_name }}.dmg"
+
+      - name: Upload to Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ${{ github.ref_name }} Tunely-*.dmg --clobber
