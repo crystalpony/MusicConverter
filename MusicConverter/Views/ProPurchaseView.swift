@@ -13,25 +13,12 @@ struct ProPurchaseView: View {
     /// 隐藏彩蛋暗号：输入后免费赠送一次转换机会
     private static let secretPassphrase = "夏家驹真帅"
 
-    /// 官网购买页地址（部署后替换为正式域名）
-    private static let purchaseURLString = "https://music-converter-web.vercel.app/purchase"
+    /// 官网购买页地址
+    private static let purchaseURLString = "https://get-tunely-app.vercel.app/purchase"
 
     var body: some View {
+        ScrollView {
         VStack(spacing: 20) {
-            // 标题栏
-            HStack {
-                Spacer()
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal)
-
             // 标题区
             VStack(spacing: 8) {
                 Image(systemName: "crown.fill")
@@ -109,8 +96,6 @@ struct ProPurchaseView: View {
                 .padding(.horizontal, 32)
             }
 
-            Spacer()
-
             // 前往官网购买（主 CTA）
             if !settings.isPro {
                 Button {
@@ -180,7 +165,17 @@ struct ProPurchaseView: View {
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 16)
         }
-        .frame(width: 440, height: 700)
+        }
+        .frame(width: 440, height: 560)
+        .overlay(alignment: .topTrailing) {
+            Button { dismiss() } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .padding(12)
+        }
         .onChange(of: activation.isPro) { isPro in
             if isPro {
                 settings.isPro = true

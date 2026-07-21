@@ -38,4 +38,10 @@ jobs:
       - name: Upload to Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload ${{ github.ref_name }} Tunely-*.dmg --clobber
+        run: |
+          if gh release view ${{ github.ref_name }} >/dev/null 2>&1; then
+            gh release upload ${{ github.ref_name }} Tunely-*.dmg --clobber
+          else
+            gh release create ${{ github.ref_name }} Tunely-*.dmg \
+              --title "${{ github.ref_name }}" --generate-notes
+          fi
