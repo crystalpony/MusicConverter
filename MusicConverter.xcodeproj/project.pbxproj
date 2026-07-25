@@ -41,6 +41,10 @@
 		000000000000000000100081 /* MusicPlatformAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100080 /* MusicPlatformAccount.swift */; };
 		000000000000000000100083 /* MusicPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100082 /* MusicPlatformService.swift */; };
 		000000000000000000100085 /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100084 /* PaymentService.swift */; };
+		0000000000000000001000A1 /* BatchDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A0 /* BatchDownloadManager.swift */; };
+		0000000000000000001000A3 /* DownloadStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A2 /* DownloadStatusView.swift */; };
+		0000000000000000001000A5 /* LocalSongSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A4 /* LocalSongSyncService.swift */; };
+		0000000000000000001000A7 /* UpdateCheckerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A6 /* UpdateCheckerService.swift */; };
 		000000000000000000100087 /* PlatformLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100086 /* PlatformLoginView.swift */; };
 		000000000000000000100089 /* PlaylistBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100088 /* PlaylistBrowserView.swift */; };
 		00000000000000000010008B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010008A /* OnboardingView.swift */; };
@@ -86,6 +90,10 @@
 		000000000000000000100080 /* MusicPlatformAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicPlatformAccount.swift"; sourceTree = "<group>"; };
 		000000000000000000100082 /* MusicPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicPlatformService.swift"; sourceTree = "<group>"; };
 		000000000000000000100084 /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentService.swift"; sourceTree = "<group>"; };
+		0000000000000000001000A0 /* BatchDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BatchDownloadManager.swift"; sourceTree = "<group>"; };
+		0000000000000000001000A2 /* DownloadStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadStatusView.swift"; sourceTree = "<group>"; };
+		0000000000000000001000A4 /* LocalSongSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalSongSyncService.swift"; sourceTree = "<group>"; };
+		0000000000000000001000A6 /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateCheckerService.swift"; sourceTree = "<group>"; };
 		000000000000000000100086 /* PlatformLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlatformLoginView.swift"; sourceTree = "<group>"; };
 		000000000000000000100088 /* PlaylistBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistBrowserView.swift"; sourceTree = "<group>"; };
 		00000000000000000010008A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingView.swift"; sourceTree = "<group>"; };
@@ -166,6 +174,7 @@
 				000000000000000000100086 /* PlatformLoginView.swift */,
 				000000000000000000100088 /* PlaylistBrowserView.swift */,
 				00000000000000000010008A /* OnboardingView.swift */,
+				0000000000000000001000A2 /* DownloadStatusView.swift */,
 			);
 			path = "Views";
 			sourceTree = "<group>";
@@ -218,6 +227,9 @@
 				000000000000000000100070 /* IAPManager.swift */,
 				000000000000000000100082 /* MusicPlatformService.swift */,
 				000000000000000000100084 /* PaymentService.swift */,
+				0000000000000000001000A0 /* BatchDownloadManager.swift */,
+				0000000000000000001000A4 /* LocalSongSyncService.swift */,
+				0000000000000000001000A6 /* UpdateCheckerService.swift */,
 			);
 			path = "Services";
 			sourceTree = "<group>";
@@ -346,6 +358,10 @@
 				000000000000000000100081 /* MusicPlatformAccount.swift in Sources */,
 				000000000000000000100083 /* MusicPlatformService.swift in Sources */,
 				000000000000000000100085 /* PaymentService.swift in Sources */,
+				0000000000000000001000A1 /* BatchDownloadManager.swift in Sources */,
+				0000000000000000001000A5 /* LocalSongSyncService.swift in Sources */,
+				0000000000000000001000A7 /* UpdateCheckerService.swift in Sources */,
+				0000000000000000001000A3 /* DownloadStatusView.swift in Sources */,
 				000000000000000000100087 /* PlatformLoginView.swift in Sources */,
 				000000000000000000100089 /* PlaylistBrowserView.swift in Sources */,
 				00000000000000000010008B /* OnboardingView.swift in Sources */,
@@ -431,7 +447,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
 				PRODUCT_NAME = Tunely;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -453,7 +469,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
 				PRODUCT_NAME = Tunely;
 				SWIFT_EMIT_LOC_STRINGS = YES;

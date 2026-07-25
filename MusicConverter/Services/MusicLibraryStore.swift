@@ -195,7 +195,8 @@ class MusicLibraryStore: ObservableObject {
     // MARK: - 元数据
 
     /// 刷新单条记录的 ID3 元数据
-    func refreshMetadata(for id: UUID) async {
+    /// - Parameter save: 是否立即写盘（批量扫描时传 false，扫完统一保存，避免每条记录都全量写 JSON）
+    func refreshMetadata(for id: UUID, save: Bool = true) async {
         guard let index = records.firstIndex(where: { $0.id == id }) else { return }
         let url = URL(fileURLWithPath: records[index].filePath)
         let meta = await MetadataReader.readMetadata(for: url)
@@ -208,7 +209,9 @@ class MusicLibraryStore: ObservableObject {
         if records[idx].coverPath == nil, let artwork = meta.artwork {
             records[idx].coverPath = saveCover(artwork, for: id)
         }
-        saveRecords()
+        if save {
+            saveRecords()
+        }
     }
 
     /// 将封面数据写入缓存目录，返回路径
@@ -259,8 +262,9 @@ class MusicLibraryStore: ObservableObject {
         records.sort { $0.convertedAt > $1.convertedAt }
         saveRecords()
         for id in addedIDs {
-            await refreshMetadata(for: id)
+            await refreshMetadata(for: id, save: false)
         }
+        saveRecords()
     }
 
     /// 扫描输出目录，补充未记录的 MP3 文件，移除已不存在的记录
@@ -305,9 +309,14 @@ class MusicLibraryStore: ObservableObject {
         records.sort { $0.convertedAt > $1.convertedAt }
         saveRecords()
 
-        // 异步读取缺失元数据的记录
+        // 异步读取缺失元数据的记录（统一写盘一次）
+        var refreshedAny = false
         for record in records where record.artist == nil || record.duration == nil {
-            await refreshMetadata(for: record.id)
+            await refreshMetadata(for: record.id, save: false)
+            refreshedAny = true
+        }
+        if refreshedAny {
+            saveRecords()
         }
     }
 

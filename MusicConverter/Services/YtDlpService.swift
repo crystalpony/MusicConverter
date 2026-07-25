@@ -138,6 +138,8 @@ class YtDlpService: ObservableObject {
         // 运行 yt-dlp，实时捕获 stdout 解析进度和最终路径
         var lastMergedPath: String?
         var cookieAccessDenied = false
+        // 进度节流：变化 >= 1% 才回调，避免高频 UI 刷新造成卡顿
+        var lastReportedProgress: Double = -1
         let stream = runner.run(launchPath: ytdlp, arguments: args)
 
         for await line in stream {
@@ -155,7 +157,12 @@ class YtDlpService: ObservableObject {
                 if let pctRange = match.range(of: #"[\d.]+"#, options: .regularExpression) {
                     let pctStr = match[pctRange]
                     if let pct = Double(pctStr) {
-                        onProgress(pct / 100.0)
+                        let progress = pct / 100.0
+                        if progress - lastReportedProgress >= 0.01
+                            || (progress >= 1.0 && lastReportedProgress < 1.0) {
+                            lastReportedProgress = progress
+                            onProgress(progress)
+                        }
                     }
                 }
             }

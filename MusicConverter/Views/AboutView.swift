@@ -4,6 +4,7 @@ import AppKit
 /// 关于面板 —— 参考 IINA 布局：左侧图标/版本/引擎，右侧简介/版权/链接
 struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var updateChecker = UpdateCheckerService.shared
 
     @State private var ytDlpVersion: String = "…"
     @State private var ffmpegVersion: String = "…"
@@ -62,6 +63,45 @@ struct AboutView: View {
             Text("版本 \(version) (\(build))")
                 .font(BauhausFont.body(12).monospacedDigit())
                 .foregroundStyle(Bauhaus.inkSecondary)
+
+            // 检查更新
+            Button {
+                Task { await updateChecker.check() }
+            } label: {
+                HStack(spacing: 5) {
+                    if updateChecker.isChecking {
+                        ProgressView().controlSize(.small)
+                        Text("检查中…")
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Text("检查更新")
+                    }
+                }
+                .font(BauhausFont.body(11))
+            }
+            .controlSize(.small)
+            .disabled(updateChecker.isChecking)
+
+            // 更新状态反馈
+            if updateChecker.updateAvailable {
+                Button {
+                    updateChecker.openDownloadPage()
+                } label: {
+                    Text("新版本 v\(updateChecker.latestVersion) · 点击下载")
+                        .font(BauhausFont.body(11))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Bauhaus.red)
+                        .bauhausBorder(width: 1.5, cornerRadius: 2)
+                }
+                .buttonStyle(.plain)
+            } else if let error = updateChecker.checkError {
+                Text(error)
+                    .font(BauhausFont.body(10))
+                    .foregroundStyle(Bauhaus.red)
+                    .multilineTextAlignment(.center)
+            }
 
             Rectangle().fill(Bauhaus.ink.opacity(0.15)).frame(height: 1).padding(.vertical, 4)
 

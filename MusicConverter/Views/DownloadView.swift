@@ -307,6 +307,10 @@ struct DownloadView: View {
                     },
                     onOutput: { line in
                         logOutput += line + "\n"
+                        // 日志限长：防止长任务日志无限增长导致文本排版越来越卡
+                        if logOutput.count > 20_000 {
+                            logOutput = String(logOutput.suffix(10_000))
+                        }
                     }
                 )
                 tasks[taskIndex].status = .completed

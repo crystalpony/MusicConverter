@@ -3,17 +3,16 @@ import SwiftUI
 /// 歌单浏览 + 批量下载 Tab
 struct PlaylistBrowserView: View {
     @EnvironmentObject var settings: AppSettings
+    @Environment(\.openWindow) private var openWindow
     @ObservedObject private var platformService = MusicPlatformService.shared
-    @StateObject private var ytDlpService = YtDlpService()
+    // 批量下载状态全局单例：切换 Tab / 窗口后进度不丢失
+    @ObservedObject private var batchManager = BatchDownloadManager.shared
+    // 本地歌曲同步：标记"已下载"、防止重复下载
+    @ObservedObject private var syncService = LocalSongSyncService.shared
 
     // 歌单选择
     @State private var selectedPlaylist: Playlist?
     @State private var selectedSongs: Set<String> = []  // song id set
-    @State private var isBatchDownloading: Bool = false
-    @State private var batchProgress: (current: Int, total: Int) = (0, 0)
-    @State private var batchTasks: [DownloadTask] = []
-    @State private var showBatchResult: Bool = false
-    @State private var lastBatchResult: YtDlpService.BatchResult?
 
     // 登录弹窗
     @State private var showLoginSheet: Bool = false
@@ -34,13 +33,23 @@ struct PlaylistBrowserView: View {
         .sheet(isPresented: $showLoginSheet) {
             PlatformLoginView(platform: platformService.selectedPlatform)
         }
-        .alert("批量下载完成", isPresented: $showBatchResult) {
+        .task {
+            // 首次进入或下载目录变更时扫描本地歌曲
+            await syncService.rescanIfNeeded(directory: settings.resolvedOutputDirectory)
+            // 已登录但歌单为空时自动刷新（每次进入该页都会检查）
+            if account?.isLoggedIn == true,
+               platformService.playlists.isEmpty,
+               !platformService.isLoadingPlaylists {
+                await platformService.loadPlaylists()
+            }
+        }
+        .alert("批量下载完成", isPresented: $batchManager.showResult) {
             Button("好的") { }
             Button("查看音乐库") {
                 NotificationCenter.default.post(name: .showMusicLibrary, object: nil)
             }
         } message: {
-            if let result = lastBatchResult {
+            if let result = batchManager.lastResult {
                 Text("成功 \(result.completed) 首，跳过 \(result.skipped) 首，失败 \(result.failed) 首\n耗时 \(formatDuration(result.totalDuration))")
             }
         }
@@ -134,6 +143,11 @@ struct PlaylistBrowserView: View {
         platformService.accounts[platformService.selectedPlatform]
     }
 
+    /// 可下载的歌曲（排除本地已存在的）
+    private var downloadableSongs: [PlatformSong] {
+        platformService.currentSongs.filter { !syncService.isDownloaded($0) }
+    }
+
     // MARK: - 右侧面板
 
     private var rightPanel: some View {
@@ -151,12 +165,26 @@ struct PlaylistBrowserView: View {
                     }
                     Spacer()
 
-                    // 全选/反选
-                    Button(selectedSongs.count == platformService.currentSongs.count ? "取消全选" : "全选") {
-                        if selectedSongs.count == platformService.currentSongs.count {
+                    // 同步刷新：重新扫描下载目录，更新"已下载"标识
+                    Button {
+                        Task { await syncService.rescan(directory: settings.resolvedOutputDirectory) }
+                    } label: {
+                        if syncService.isScanning {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Label("同步", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                    }
+                    .font(.caption)
+                    .disabled(syncService.isScanning)
+                    .help("重新扫描下载目录，更新歌曲的\"已下载\"标识")
+
+                    // 全选/反选（仅针对未下载且不在队列中的歌曲）
+                    Button(selectedSongs.count == downloadableSongs.count && !downloadableSongs.isEmpty ? "取消全选" : "全选") {
+                        if selectedSongs.count == downloadableSongs.count {
                             selectedSongs = []
                         } else {
-                            selectedSongs = Set(platformService.currentSongs.map { $0.id })
+                            selectedSongs = Set(downloadableSongs.map { $0.id })
                         }
                     }
                     .font(.caption)
@@ -169,14 +197,30 @@ struct PlaylistBrowserView: View {
                     }
                     .frame(width: 160)
 
-                    // 批量下载按钮
+                    // 下载状态窗口入口（有任务时显示）
+                    if !batchManager.tasks.isEmpty {
+                        Button {
+                            openWindow(id: "download-status")
+                        } label: {
+                            Label(batchManager.isDownloading
+                                  ? "下载状态 \(batchManager.completedCount)/\(batchManager.totalCount)"
+                                  : "下载状态",
+                                  systemImage: "list.bullet.rectangle")
+                        }
+                        .help("打开下载状态窗口，查看所有下载中和待下载的歌曲")
+                    }
+
+                    // 批量下载按钮（下载中也可继续追加到队列）
                     Button {
                         startBatchDownload()
                     } label: {
-                        Label("下载选中 (\(selectedSongs.count))", systemImage: "arrow.down.circle.fill")
+                        Label(batchManager.isDownloading
+                              ? "加入队列 (\(selectedSongs.count))"
+                              : "下载选中 (\(selectedSongs.count))",
+                              systemImage: "arrow.down.circle.fill")
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(selectedSongs.isEmpty || isBatchDownloading)
+                    .disabled(selectedSongs.isEmpty)
                 }
                 .padding()
 
@@ -193,7 +237,8 @@ struct PlaylistBrowserView: View {
                             SongRowView(
                                 song: song,
                                 isSelected: selectedSongs.contains(song.id),
-                                isDownloading: isBatchDownloading,
+                                task: batchManager.task(forSongId: song.id),
+                                isLocalDownloaded: syncService.isDownloaded(song),
                                 onToggle: {
                                     if selectedSongs.contains(song.id) {
                                         selectedSongs.remove(song.id)
@@ -208,12 +253,18 @@ struct PlaylistBrowserView: View {
                 }
 
                 // 批量下载进度条
-                if isBatchDownloading {
+                if batchManager.isDownloading {
                     VStack(spacing: 6) {
-                        ProgressView(value: Double(batchProgress.current), total: Double(max(batchProgress.total, 1)))
-                        Text("正在下载 \(batchProgress.current)/\(batchProgress.total)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        ProgressView(value: Double(batchManager.completedCount), total: Double(max(batchManager.totalCount, 1)))
+                        HStack(spacing: 6) {
+                            Text("正在下载 \(batchManager.completedCount)/\(batchManager.totalCount)")
+                            if let title = batchManager.currentDownloadingTitle {
+                                Text("·")
+                                Text(title).lineLimit(1)
+                            }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     }
                     .padding()
                     .background(Color.accentColor.opacity(0.05))
@@ -249,61 +300,41 @@ struct PlaylistBrowserView: View {
     // MARK: - 批量下载
 
     private func startBatchDownload() {
-        let songsToDownload = platformService.currentSongs.filter { selectedSongs.contains($0.id) }
+        // 过滤本地已存在与已在队列中（待下载/下载中）的歌曲，避免重复下载
+        let songsToDownload = platformService.currentSongs.filter {
+            selectedSongs.contains($0.id)
+                && !batchManager.isQueued(songId: $0.id)
+                && !syncService.isDownloaded($0)
+        }
         guard !songsToDownload.isEmpty else { return }
 
-        // 免费版累计下载限制（试下载 5 首）
+        // 免费版累计下载限制（试下载 5 首，含队列中预占的配额）
         if !settings.isPro {
             if settings.isDownloadLimitReached {
                 // 已达上限，弹出 Pro 升级提示
                 NotificationCenter.default.post(name: .showProPurchase, object: nil)
                 return
             }
-            if songsToDownload.count > settings.remainingFreeDownloads {
+            if songsToDownload.count + batchManager.activeCount > settings.remainingFreeDownloads {
                 // 本批次超出剩余配额，弹出 Pro 升级提示
                 NotificationCenter.default.post(name: .showProPurchase, object: nil)
                 return
             }
         }
 
-        isBatchDownloading = true
-        batchProgress = (0, songsToDownload.count)
-        batchTasks = []
+        // 交给全局管理器执行，下载中也可继续追加，视图销毁不影响下载
+        batchManager.enqueue(
+            songs: songsToDownload,
+            format: selectedFormat,
+            playlistName: selectedPlaylist?.name ?? "",
+            settings: settings
+        )
 
-        let playlistName = selectedPlaylist?.name ?? ""
-        let cookieFile = settings.effectiveCookieFilePath
+        // 清空选择，方便继续挑下一批
+        selectedSongs = []
 
-        Task {
-            let result = await ytDlpService.batchDownload(
-                songs: songsToDownload,
-                outputDir: settings.resolvedOutputDirectory,
-                format: selectedFormat,
-                bitrate: settings.defaultBitrate,
-                cookieFile: cookieFile,
-                cookiesFromBrowser: settings.effectiveCookieBrowser,
-                proxy: settings.useProxy ? settings.proxyAddress : nil,
-                playlistName: playlistName,
-                onTaskUpdate: { index, task in
-                    if index < batchTasks.count {
-                        batchTasks[index] = task
-                    } else {
-                        batchTasks.append(task)
-                    }
-                },
-                onProgress: { current, total in
-                    batchProgress = (current, total)
-                }
-            )
-
-            // 更新统计数据
-            settings.totalDownloadCount += result.completed
-            // 每首歌约节省 2 分钟手动操作
-            settings.totalSavedMinutes += result.completed * 2
-
-            lastBatchResult = result
-            isBatchDownloading = false
-            showBatchResult = true
-        }
+        // 自动打开下载状态窗口，方便监视整个队列
+        openWindow(id: "download-status")
     }
 
     // MARK: - Helpers
@@ -363,19 +394,32 @@ struct PlaylistRowView: View {
 struct SongRowView: View {
     let song: PlatformSong
     let isSelected: Bool
-    let isDownloading: Bool
+    /// 本批次中该歌曲的下载任务（nil 表示不在本批次）
+    var task: DownloadTask? = nil
+    /// 本地下载目录中已存在该歌曲
+    var isLocalDownloaded: Bool = false
     let onToggle: () -> Void
+
+    /// 该歌曲是否在队列中未处理完（此时不允许改选，防止重复添加）
+    private var isQueued: Bool {
+        task?.status == .pending || task?.status == .downloading
+    }
+
+    /// 是否锁定勾选（队列处理中 / 本地已下载）
+    private var isLocked: Bool {
+        isQueued || isLocalDownloaded
+    }
 
     var body: some View {
         HStack(spacing: 10) {
-            // 方形勾选框
+            // 方形勾选框（本地已下载显示绿色对勾并锁定）
             Button(action: onToggle) {
                 ZStack {
                     Rectangle()
-                        .fill(isSelected ? Bauhaus.red : Color.clear)
+                        .fill(isLocalDownloaded ? Color.green.opacity(0.9) : (isSelected ? Bauhaus.red : Color.clear))
                         .frame(width: 18, height: 18)
                         .bauhausBorder(width: 2, cornerRadius: 2)
-                    if isSelected {
+                    if isLocalDownloaded || isSelected {
                         Image(systemName: "checkmark")
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(.white)
@@ -383,13 +427,13 @@ struct SongRowView: View {
                 }
             }
             .buttonStyle(.plain)
-            .disabled(isDownloading)
+            .disabled(isLocked)
 
-            // 歌曲信息
+            // 歌曲信息（已下载置灰）
             VStack(alignment: .leading, spacing: 2) {
                 Text(song.title)
                     .font(BauhausFont.body(13))
-                    .foregroundStyle(Bauhaus.ink)
+                    .foregroundStyle(isLocalDownloaded ? Bauhaus.inkSecondary : Bauhaus.ink)
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     Text(song.artist)
@@ -403,6 +447,17 @@ struct SongRowView: View {
 
             Spacer()
 
+            // 下载状态（本批次内的歌曲实时展示；否则显示本地"已下载"标识）
+            if let task {
+                statusView(for: task)
+            } else if isLocalDownloaded {
+                Label("已下载", systemImage: "checkmark.circle.fill")
+                    .font(BauhausFont.body(11))
+                    .foregroundStyle(.green)
+                    .labelStyle(.titleAndIcon)
+                    .help("下载目录中已存在该歌曲，无需重复下载")
+            }
+
             // 时长
             Text(song.formattedDuration)
                 .font(BauhausFont.body(11))
@@ -411,7 +466,49 @@ struct SongRowView: View {
         }
         .padding(.vertical, 3)
         .contentShape(Rectangle())
-        .onTapGesture(perform: onToggle)
+        .onTapGesture {
+            if !isLocked { onToggle() }
+        }
+    }
+
+    /// 单曲下载状态标签
+    @ViewBuilder
+    private func statusView(for task: DownloadTask) -> some View {
+        switch task.status {
+        case .downloading:
+            HStack(spacing: 6) {
+                ProgressView(value: task.progress)
+                    .progressViewStyle(.linear)
+                    .frame(width: 70)
+                Text("\(Int(task.progress * 100))%")
+                    .font(BauhausFont.body(11))
+                    .foregroundStyle(Bauhaus.blue)
+                    .monospacedDigit()
+            }
+        case .completed:
+            Label("已完成", systemImage: "checkmark.circle.fill")
+                .font(BauhausFont.body(11))
+                .foregroundStyle(.green)
+                .labelStyle(.titleAndIcon)
+        case .failed:
+            Label("失败", systemImage: "xmark.circle.fill")
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.red)
+                .labelStyle(.titleAndIcon)
+                .help(task.errorMessage ?? "下载失败")
+        case .skipped:
+            Text("已跳过")
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.yellow)
+        case .pending:
+            Text("等待中")
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.inkSecondary)
+        case .converting:
+            Text("转换中")
+                .font(BauhausFont.body(11))
+                .foregroundStyle(Bauhaus.blue)
+        }
     }
 }
 
