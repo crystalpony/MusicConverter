@@ -14,7 +14,7 @@ struct ProPurchaseView: View {
     private static let secretPassphrase = "夏家驹真帅"
 
     /// 官网购买页地址
-    private static let purchaseURLString = "https://get-tunely-app.vercel.app/purchase"
+    private static let purchaseURLString = "https://gettunely.cn/purchase"
 
     var body: some View {
         ScrollView {
@@ -114,8 +114,8 @@ struct ProPurchaseView: View {
 
                 // 购买指引
                 VStack(alignment: .leading, spacing: 6) {
-                    purchaseStep(number: "1", text: "点击上方按钮打开购买页面，扫码支付")
-                    purchaseStep(number: "2", text: "在页面粘贴下方「本机识别码」，生成激活码")
+                    purchaseStep(number: "1", text: "点击上方按钮打开购买页面，确认本机识别码并创建订单")
+                    purchaseStep(number: "2", text: "在支付宝收银台完成支付，返回购买页领取激活码")
                     purchaseStep(number: "3", text: "复制激活码，回到 App 手动输入激活")
                 }
                 .padding(.horizontal, 40)
@@ -160,7 +160,7 @@ struct ProPurchaseView: View {
             .foregroundStyle(.secondary)
             .padding(.horizontal, 32)
 
-            Text("在购买页输入本机识别码即可即时获取激活码")
+            Text("支付成功后，购买页会显示本机专属激活码")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 16)

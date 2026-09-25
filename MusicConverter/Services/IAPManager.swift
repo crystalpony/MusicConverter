@@ -2,10 +2,9 @@ import SwiftUI
 import IOKit
 import CryptoKit
 
-/// 本地激活码管理器 - 一次付款绑定一台电脑
+/// Pro 授权由服务器签发，App 只保存和验证签名。
 @MainActor
 class ActivationManager: ObservableObject {
-
     static let shared = ActivationManager()
 
     @Published var isPro: Bool = false
@@ -14,18 +13,15 @@ class ActivationManager: ObservableObject {
     @Published var activationResult: String?
     @Published var activationSuccess: Bool = false
 
-    /// 用于生成激活码的密钥（开发者持有）
-    private static let secretKey = "MusicConverter2026Pro"
+    private static let publicKeyBase64 = "7w4E8M500cr5rruQlR/g6Eogn1tP2UzfnHL/z4tHxWw="
 
     private init() {
         machineCode = Self.getHardwareUUID()
-        isPro = UserDefaults.standard.bool(forKey: "isPro")
         activationCode = UserDefaults.standard.string(forKey: "activationCode") ?? ""
+        isPro = Self.isValid(code: activationCode, machineCode: machineCode)
+        UserDefaults.standard.set(isPro, forKey: "isPro")
     }
 
-    // MARK: - 获取本机硬件 UUID
-
-    /// 获取稳定的硬件 UUID 作为机器码
     static func getHardwareUUID() -> String {
         let platformExpert = IOServiceGetMatchingService(
             kIOMainPortDefault,
@@ -34,7 +30,7 @@ class ActivationManager: ObservableObject {
         guard platformExpert != 0 else { return "UNKNOWN" }
         defer { IOObjectRelease(platformExpert) }
 
-        guard let serialNumber = IORegistryEntryCreateCFProperty(
+        guard let uuid = IORegistryEntryCreateCFProperty(
             platformExpert,
             kIOPlatformUUIDKey as CFString,
             kCFAllocatorDefault,
@@ -42,23 +38,27 @@ class ActivationManager: ObservableObject {
         )?.takeRetainedValue() as? String else {
             return "UNKNOWN"
         }
-        return serialNumber
+        return uuid
     }
 
-    // MARK: - 生成激活码（开发者用）
+    private static func isValid(code: String, machineCode: String) -> Bool {
+        guard code.hasPrefix("TLY1."),
+              let publicKeyData = Data(base64Encoded: publicKeyBase64),
+              let publicKey = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKeyData) else {
+            return false
+        }
 
-    /// 根据机器码生成对应的激活码
-    static func generateActivationCode(for machineCode: String) -> String {
-        let raw = "\(machineCode)-\(secretKey)"
-        let hash = Self.sha256(raw)
-        // 取前 24 位，格式化为 XXXX-XXXX-XXXX-XXXX-XXXX-XXXX
-        let chars = Array(hash.prefix(24).uppercased())
-        return stride(from: 0, to: chars.count, by: 4).map {
-            String(chars[$0..<min($0 + 4, chars.count)])
-        }.joined(separator: "-")
+        var encodedSignature = String(code.dropFirst(5))
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        encodedSignature += String(repeating: "=", count: (4 - encodedSignature.count % 4) % 4)
+        guard let signature = Data(base64Encoded: encodedSignature), signature.count == 64 else {
+            return false
+        }
+
+        let message = Data("TunelyPro:v1:\(machineCode.uppercased())".utf8)
+        return publicKey.isValidSignature(signature, for: message)
     }
-
-    // MARK: - 验证激活码
 
     func activate(code: String) {
         let trimmed = code.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -67,24 +67,15 @@ class ActivationManager: ObservableObject {
             return
         }
 
-        let expected = Self.generateActivationCode(for: machineCode)
-        if trimmed.uppercased() == expected {
+        if Self.isValid(code: trimmed, machineCode: machineCode) {
             isPro = true
             activationCode = trimmed
             activationSuccess = true
             activationResult = nil
-            UserDefaults.standard.set(true, forKey: "isPro")
             UserDefaults.standard.set(trimmed, forKey: "activationCode")
+            UserDefaults.standard.set(true, forKey: "isPro")
         } else {
-            activationResult = "激活码无效，请确认是否为本机生成的激活码"
+            activationResult = "激活码无效，请确认是本机购买后获得的完整激活码"
         }
-    }
-
-    // MARK: - SHA256
-
-    private static func sha256(_ input: String) -> String {
-        guard let data = input.data(using: .utf8) else { return "" }
-        let hash = SHA256.hash(data: data)
-        return hash.map { String(format: "%02x", $0) }.joined()
     }
 }

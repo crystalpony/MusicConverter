@@ -18,14 +18,17 @@ jobs:
           xcodebuild -project MusicConverter.xcodeproj \
             -scheme MusicConverter \
             -configuration Release \
-            -arch arm64 -arch x86_64 \
+            -destination 'generic/platform=macOS' \
             -derivedDataPath build \
+            ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO \
             CODE_SIGNING_ALLOWED=NO build
 
       - name: Sign (ad-hoc)
         run: |
           APP_PATH=$(find build -name "Tunely.app" -type d | head -1)
           codesign --force --deep --sign - "$APP_PATH"
+          codesign --verify --deep --strict "$APP_PATH"
+          lipo "$APP_PATH/Contents/MacOS/Tunely" -verify_arch x86_64 arm64
 
       - name: Package DMG
         run: |
