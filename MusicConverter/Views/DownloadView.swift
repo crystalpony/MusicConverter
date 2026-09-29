@@ -3,18 +3,20 @@ import SwiftUI
 /// 下载 Tab：URL 输入 + 下载列表 + 进度（复古包豪斯，随窗口自适应）
 struct DownloadView: View {
     @EnvironmentObject var settings: AppSettings
-    @StateObject private var service = YtDlpService()
+    @Environment(\.openWindow) private var openWindow
+    @ObservedObject private var downloadManager = DirectDownloadManager.shared
 
     @State private var urlInput: String = ""
-    @State private var tasks: [DownloadTask] = []
-    @State private var isDownloading: Bool = false
-    @State private var logOutput: String = ""
+    private var tasks: [DownloadTask] { downloadManager.tasks }
+    private var isDownloading: Bool { downloadManager.isDownloading }
+    private var logOutput: String { downloadManager.logOutput }
 
     /// 格式选择对话框
     @State private var pendingURL: String?
     @State private var pendingPlatform: String = ""
     @State private var showFormatSheet: Bool = false
     @State private var selectedFormat: DownloadFormat = .audioMP3
+    @State private var createInstrumental = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -25,6 +27,10 @@ struct DownloadView: View {
                     .font(BauhausFont.title(24))
                     .foregroundStyle(Bauhaus.ink)
                 Spacer()
+                Button("下载状态") { openWindow(id: "download-status") }
+                    .buttonStyle(.plain)
+                    .font(BauhausFont.body(12))
+                    .foregroundStyle(Bauhaus.blue)
             }
 
             // URL 输入卡片
@@ -45,19 +51,10 @@ struct DownloadView: View {
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Bauhaus.paper)
-        .confirmationDialog("选择下载格式", isPresented: $showFormatSheet, titleVisibility: .visible) {
-            ForEach(DownloadFormat.downloadMenuOrder, id: \.self) { fmt in
-                Button(fmt.dialogLabel) {
-                    selectedFormat = fmt
-                    startDownload()
-                }
-            }
-            Button("取消", role: .cancel) {
-                pendingURL = nil
-            }
-        } message: {
-            Text(formatDialogMessage)
+        .sheet(isPresented: $showFormatSheet) {
+            formatSheet
         }
+
     }
 
     /// 格式选择弹窗的引导文案
@@ -66,8 +63,45 @@ struct DownloadView: View {
         if !pendingPlatform.isEmpty {
             lines.append("来源：\(pendingPlatform)")
         }
-        lines.append("要看视频选「视频 MP4」；只要音乐选「仅音频 MP3」。「原画视频」为高阶选项，部分高清编码可能无法在本机直接播放。")
+        lines.append("要看视频选「视频 MP4」；只要音乐选「仅音频 MP3」。首次生成伴奏会自动下载本机分离组件，约需 1 GB 空间。")
         return lines.joined(separator: "\n")
+    }
+
+    private var formatSheet: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("选择下载格式")
+                .font(BauhausFont.title(20))
+            Text(formatDialogMessage)
+                .font(BauhausFont.body(12))
+                .foregroundStyle(Bauhaus.inkSecondary)
+
+            ForEach(DownloadFormat.downloadMenuOrder, id: \.self) { format in
+                Button(format.dialogLabel) {
+                    chooseFormat(format)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            Button("下载并生成伴奏（保留原曲）") {
+                chooseFormat(.audioMP3, createInstrumental: true)
+            }
+            .frame(maxWidth: .infinity)
+
+            Button("取消") {
+                pendingURL = nil
+                showFormatSheet = false
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .padding(24)
+        .frame(width: 480)
+    }
+
+    private func chooseFormat(_ format: DownloadFormat, createInstrumental: Bool = false) {
+        selectedFormat = format
+        self.createInstrumental = createInstrumental
+        showFormatSheet = false
+        beginSingleDownload()
     }
 
     // MARK: - 输入栏
@@ -177,10 +211,23 @@ struct DownloadView: View {
             Spacer()
 
             if task.status == .downloading {
-                ProgressView(value: task.progress)
-                    .progressViewStyle(.linear)
-                    .tint(Bauhaus.red)
-                    .frame(width: 130)
+                HStack(spacing: 8) {
+                    ProgressView(value: task.progress)
+                        .progressViewStyle(.linear)
+                        .tint(Bauhaus.red)
+                        .frame(width: 130)
+                    Text("\(Int(task.progress * 100))%")
+                        .font(BauhausFont.body(11).monospacedDigit())
+                        .foregroundStyle(Bauhaus.inkSecondary)
+                        .frame(width: 36, alignment: .trailing)
+                }
+            } else if task.status == .converting {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text("处理中")
+                        .font(BauhausFont.body(12))
+                        .foregroundStyle(Bauhaus.blue)
+                }
             } else {
                 Text(task.status.rawValue)
                     .font(BauhausFont.body(12))
@@ -237,26 +284,27 @@ struct DownloadView: View {
 
     /// 弹出格式选择（不再直接下载）
     private func promptFormat() {
+        guard !isDownloading else { return }
         let rawInput = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawInput.isEmpty else { return }
         // BT / 磁力链接暂不支持
         if PlatformDetector.isTorrentLink(rawInput) {
-            logOutput += "[提示] 暂不支持 BT / 磁力链接（magnet:、.torrent）。请粘贴平台链接或视频直链（如 https://…/video.mp4）。\n"
+            downloadManager.appendLog("[提示] 暂不支持 BT / 磁力链接（magnet:、.torrent）。请粘贴平台链接或视频直链（如 https://…/video.mp4）。")
             return
         }
         guard let cleanedURL = PlatformDetector.extractURL(from: rawInput) else {
-            logOutput += "[错误] 未检测到有效 URL：\(rawInput)\n"
+            downloadManager.appendLog("[错误] 未检测到有效 URL：\(rawInput)")
             return
         }
         // 前置拦截不支持的平台
         if let unsupported = PlatformDetector.unsupportedPlatform(url: cleanedURL) {
-            logOutput += "[错误] 不支持 \(unsupported)：该平台有 DRM 保护，yt-dlp 无法下载\n"
+            downloadManager.appendLog("[错误] 不支持 \(unsupported)：该平台有 DRM 保护，yt-dlp 无法下载")
             return
         }
         // 条件支持平台检测（需要 Cookie）
         let hasCookie = settings.effectiveCookieFilePath != nil
         if let conditional = PlatformDetector.conditionalPlatform(url: cleanedURL, hasCookie: hasCookie) {
-            logOutput += "[提示] \(conditional) 需要先登录账号（在「歌单」Tab 扫码登录）或配置 Cookie 文件后才能下载\n"
+            downloadManager.appendLog("[提示] \(conditional) 需要先登录账号（在「歌单」Tab 扫码登录）或配置 Cookie 文件后才能下载")
             return
         }
         pendingURL = cleanedURL
@@ -264,13 +312,13 @@ struct DownloadView: View {
         showFormatSheet = true
     }
 
-    /// 用户选定格式后开始下载
-    private func startDownload() {
+    /// 单集下载（原有流程）
+    private func beginSingleDownload() {
         guard let cleanedURL = pendingURL else { return }
 
         // 免费版累计下载限制（试下载 5 首）
         if !settings.isPro && settings.isDownloadLimitReached {
-            logOutput += "[限制] 免费试下载 \(AppSettings.freeDownloadLimit) 首已用完，请升级 Pro 解锁无限下载\n"
+            downloadManager.appendLog("[限制] 免费试下载 \(AppSettings.freeDownloadLimit) 首已用完，请升级 Pro 解锁无限下载")
             pendingURL = nil
             NotificationCenter.default.post(name: .showProPurchase, object: nil)
             return
@@ -278,56 +326,16 @@ struct DownloadView: View {
 
         let fmt = selectedFormat
 
-        var task = DownloadTask(
+        downloadManager.start(
             url: cleanedURL,
             platform: pendingPlatform,
-            bitrate: settings.defaultBitrate,
-            format: fmt.rawValue
+            format: fmt,
+            createInstrumental: createInstrumental,
+            settings: settings
         )
-        task.status = .downloading
-        tasks.append(task)
-        let taskIndex = tasks.count - 1
         urlInput = ""
         pendingURL = nil
-        isDownloading = true
-        logOutput = ""
-
-        Task {
-            do {
-                let result = try await service.download(
-                    url: cleanedURL,
-                    outputDir: settings.resolvedOutputDirectory,
-                    format: fmt,
-                    bitrate: settings.defaultBitrate,
-                    cookieFile: settings.effectiveCookieFilePath,
-                    cookiesFromBrowser: settings.effectiveCookieBrowser,
-                    proxy: settings.useProxy ? settings.proxyAddress : nil,
-                    onProgress: { progress in
-                        tasks[taskIndex].progress = progress
-                    },
-                    onOutput: { line in
-                        logOutput += line + "\n"
-                        // 日志限长：防止长任务日志无限增长导致文本排版越来越卡
-                        if logOutput.count > 20_000 {
-                            logOutput = String(logOutput.suffix(10_000))
-                        }
-                    }
-                )
-                tasks[taskIndex].status = .completed
-                tasks[taskIndex].title = result.title
-                tasks[taskIndex].outputPath = result.path
-                // 入库（音频→音乐库 / 视频→影音库，按扩展名自动判定）
-                MusicLibraryStore.shared.addRecord(filePath: result.path, sourceFileName: result.title)
-                // 累计下载计数
-                settings.totalDownloadCount += 1
-                settings.totalSavedMinutes += 2
-            } catch {
-                tasks[taskIndex].status = .failed
-                tasks[taskIndex].errorMessage = error.localizedDescription
-                logOutput += "[错误] \(error.localizedDescription)\n"
-            }
-            isDownloading = false
-        }
+        createInstrumental = false
     }
 
     private func statusColor(_ status: DownloadTask.TaskStatus) -> Color {

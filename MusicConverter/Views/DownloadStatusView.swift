@@ -1,15 +1,19 @@
 import SwiftUI
 
-/// 下载状态窗口：监视批量队列中所有下载中 / 待下载 / 已完成的歌曲
-/// 数据来自全局 BatchDownloadManager，独立窗口可随时打开，不影响主窗口操作
+/// 下载状态窗口：同时监视链接下载和歌单批量下载
 struct DownloadStatusView: View {
     @ObservedObject private var batchManager = BatchDownloadManager.shared
+    @ObservedObject private var directManager = DirectDownloadManager.shared
+
+    private var allTasks: [DownloadTask] {
+        directManager.tasks + batchManager.tasks
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             header
 
-            if batchManager.tasks.isEmpty {
+            if allTasks.isEmpty {
                 emptyState
             } else {
                 summaryBar
@@ -32,10 +36,10 @@ struct DownloadStatusView: View {
                 .font(BauhausFont.title(20))
                 .foregroundStyle(Bauhaus.ink)
             Spacer()
-            if batchManager.isDownloading {
+            if batchManager.isDownloading || directManager.isDownloading {
                 HStack(spacing: 6) {
                     ProgressView().controlSize(.small)
-                    Text("下载中 \(batchManager.completedCount)/\(batchManager.totalCount)")
+                    Text("任务进行中")
                         .font(BauhausFont.body(12))
                         .foregroundStyle(Bauhaus.inkSecondary)
                         .monospacedDigit()
@@ -50,7 +54,7 @@ struct DownloadStatusView: View {
 
     private var summaryBar: some View {
         HStack(spacing: 10) {
-            countBadge("下载中", count: count(of: .downloading), color: Bauhaus.blue)
+            countBadge("进行中", count: count(of: .downloading) + count(of: .converting), color: Bauhaus.blue)
             countBadge("等待中", count: count(of: .pending), color: Bauhaus.inkSecondary)
             countBadge("已完成", count: count(of: .completed), color: .green)
             countBadge("失败", count: count(of: .failed), color: Bauhaus.red)
@@ -62,7 +66,7 @@ struct DownloadStatusView: View {
     }
 
     private func count(of status: DownloadTask.TaskStatus) -> Int {
-        batchManager.tasks.filter { $0.status == status }.count
+        allTasks.filter { $0.status == status }.count
     }
 
     private func countBadge(_ title: String, count: Int, color: Color) -> some View {
@@ -83,7 +87,7 @@ struct DownloadStatusView: View {
 
     /// 排序：下载中 > 等待中 > 失败 > 已跳过 > 已完成
     private var sortedTasks: [DownloadTask] {
-        batchManager.tasks.sorted { rank($0.status) < rank($1.status) }
+        allTasks.sorted { rank($0.status) < rank($1.status) }
     }
 
     private func rank(_ status: DownloadTask.TaskStatus) -> Int {
@@ -115,7 +119,7 @@ struct DownloadStatusView: View {
             statusIcon(task.status)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(task.title)
+                Text(task.title.isEmpty ? task.url : task.title)
                     .font(BauhausFont.body(13))
                     .foregroundStyle(Bauhaus.ink)
                     .lineLimit(1)
@@ -147,6 +151,13 @@ struct DownloadStatusView: View {
                         .font(BauhausFont.body(11))
                         .foregroundStyle(Bauhaus.blue)
                         .monospacedDigit()
+                }
+            } else if task.status == .converting {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text("处理中")
+                        .font(BauhausFont.body(11))
+                        .foregroundStyle(Bauhaus.blue)
                 }
             } else {
                 Text(task.status.rawValue)
@@ -204,7 +215,7 @@ struct DownloadStatusView: View {
             Text("暂无下载任务")
                 .font(BauhausFont.heading(14))
                 .foregroundStyle(Bauhaus.ink)
-            Text("在「歌单」页选择歌曲并点击下载后，这里会实时显示每首歌的状态")
+            Text("在「下载」或「歌单」页开始任务后，这里会显示进度")
                 .font(BauhausFont.body(12))
                 .foregroundStyle(Bauhaus.inkSecondary)
                 .multilineTextAlignment(.center)

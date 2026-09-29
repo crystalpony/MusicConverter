@@ -29,6 +29,9 @@
 		000000000000000000100059 /* ffmpeg in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100058 /* ffmpeg */; };
 		00000000000000000010005B /* ncmdump in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005A /* ncmdump */; };
 		00000000000000000010005D /* yt-dlp in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000010005C /* yt-dlp */; };
+		0000000000000000001000C1 /* uv in Resources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000C0 /* uv */; };
+		0000000000000000001000C3 /* uv-LICENSE-MIT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000C2 /* uv-LICENSE-MIT.txt */; };
+		0000000000000000001000C5 /* uv-LICENSE-APACHE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000C4 /* uv-LICENSE-APACHE.txt */; };
 		000000000000000000100061 /* MenuBarStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100060 /* MenuBarStateManager.swift */; };
 		000000000000000000100063 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100062 /* MenuBarPopoverView.swift */; };
 		000000000000000000100065 /* MusicLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100064 /* MusicLibraryStore.swift */; };
@@ -42,6 +45,8 @@
 		000000000000000000100083 /* MusicPlatformService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100082 /* MusicPlatformService.swift */; };
 		000000000000000000100085 /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000100084 /* PaymentService.swift */; };
 		0000000000000000001000A1 /* BatchDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A0 /* BatchDownloadManager.swift */; };
+		0000000000000000001000B7 /* DirectDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000B6 /* DirectDownloadManager.swift */; };
+		0000000000000000001000B9 /* AudioSeparatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000B8 /* AudioSeparatorService.swift */; };
 		0000000000000000001000A3 /* DownloadStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A2 /* DownloadStatusView.swift */; };
 		0000000000000000001000A5 /* LocalSongSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A4 /* LocalSongSyncService.swift */; };
 		0000000000000000001000A7 /* UpdateCheckerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000000000000000001000A6 /* UpdateCheckerService.swift */; };
@@ -78,6 +83,9 @@
 		000000000000000000100058 /* ffmpeg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ffmpeg"; sourceTree = "<group>"; };
 		00000000000000000010005A /* ncmdump */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "ncmdump"; sourceTree = "<group>"; };
 		00000000000000000010005C /* yt-dlp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "yt-dlp"; sourceTree = "<group>"; };
+		0000000000000000001000C0 /* uv */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = "uv"; sourceTree = "<group>"; };
+		0000000000000000001000C2 /* uv-LICENSE-MIT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "uv-LICENSE-MIT.txt"; sourceTree = "<group>"; };
+		0000000000000000001000C4 /* uv-LICENSE-APACHE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "uv-LICENSE-APACHE.txt"; sourceTree = "<group>"; };
 		000000000000000000100060 /* MenuBarStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MenuBarStateManager.swift"; sourceTree = "<group>"; };
 		000000000000000000100062 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MenuBarPopoverView.swift"; sourceTree = "<group>"; };
 		000000000000000000100064 /* MusicLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLibraryStore.swift"; sourceTree = "<group>"; };
@@ -91,6 +99,8 @@
 		000000000000000000100082 /* MusicPlatformService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicPlatformService.swift"; sourceTree = "<group>"; };
 		000000000000000000100084 /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentService.swift"; sourceTree = "<group>"; };
 		0000000000000000001000A0 /* BatchDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BatchDownloadManager.swift"; sourceTree = "<group>"; };
+		0000000000000000001000B6 /* DirectDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DirectDownloadManager.swift"; sourceTree = "<group>"; };
+		0000000000000000001000B8 /* AudioSeparatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioSeparatorService.swift"; sourceTree = "<group>"; };
 		0000000000000000001000A2 /* DownloadStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadStatusView.swift"; sourceTree = "<group>"; };
 		0000000000000000001000A4 /* LocalSongSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalSongSyncService.swift"; sourceTree = "<group>"; };
 		0000000000000000001000A6 /* UpdateCheckerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UpdateCheckerService.swift"; sourceTree = "<group>"; };
@@ -228,6 +238,8 @@
 				000000000000000000100082 /* MusicPlatformService.swift */,
 				000000000000000000100084 /* PaymentService.swift */,
 				0000000000000000001000A0 /* BatchDownloadManager.swift */,
+				0000000000000000001000B6 /* DirectDownloadManager.swift */,
+				0000000000000000001000B8 /* AudioSeparatorService.swift */,
 				0000000000000000001000A4 /* LocalSongSyncService.swift */,
 				0000000000000000001000A6 /* UpdateCheckerService.swift */,
 			);
@@ -252,6 +264,9 @@
 				000000000000000000100058 /* ffmpeg */,
 				00000000000000000010005A /* ncmdump */,
 				00000000000000000010005C /* yt-dlp */,
+				0000000000000000001000C0 /* uv */,
+				0000000000000000001000C2 /* uv-LICENSE-MIT.txt */,
+				0000000000000000001000C4 /* uv-LICENSE-APACHE.txt */,
 			);
 			path = "Resources";
 			sourceTree = "<group>";
@@ -318,6 +333,9 @@
 				000000000000000000100059 /* ffmpeg in Resources */,
 				00000000000000000010005B /* ncmdump in Resources */,
 				00000000000000000010005D /* yt-dlp in Resources */,
+				0000000000000000001000C1 /* uv in Resources */,
+				0000000000000000001000C3 /* uv-LICENSE-MIT.txt in Resources */,
+				0000000000000000001000C5 /* uv-LICENSE-APACHE.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,6 +377,8 @@
 				000000000000000000100083 /* MusicPlatformService.swift in Sources */,
 				000000000000000000100085 /* PaymentService.swift in Sources */,
 				0000000000000000001000A1 /* BatchDownloadManager.swift in Sources */,
+				0000000000000000001000B7 /* DirectDownloadManager.swift in Sources */,
+				0000000000000000001000B9 /* AudioSeparatorService.swift in Sources */,
 				0000000000000000001000A5 /* LocalSongSyncService.swift in Sources */,
 				0000000000000000001000A7 /* UpdateCheckerService.swift in Sources */,
 				0000000000000000001000A3 /* DownloadStatusView.swift in Sources */,
@@ -439,7 +459,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Tunely;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -447,7 +467,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.1;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
 				PRODUCT_NAME = Tunely;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -461,7 +481,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Tunely;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -469,7 +489,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.2.1;
+				MARKETING_VERSION = 2.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xiajiaju.MusicConverter";
 				PRODUCT_NAME = Tunely;
 				SWIFT_EMIT_LOC_STRINGS = YES;

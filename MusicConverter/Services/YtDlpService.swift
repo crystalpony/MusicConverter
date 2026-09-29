@@ -80,6 +80,7 @@ class YtDlpService: ObservableObject {
         cookiesFromBrowser: String? = nil,
         proxy: String? = nil,
         onProgress: @escaping (Double) -> Void = { _ in },
+        onProcessing: @escaping () -> Void = {},
         onOutput: @escaping (String) -> Void = { _ in }
     ) async throws -> (path: String, title: String) {
         try FileUtil.ensureDirectory(outputDir)
@@ -106,6 +107,9 @@ class YtDlpService: ObservableObject {
             "--no-warnings",
             "--newline",
             "--no-colors",
+            // 后处理（提取 MP3、合并视频）完成后输出实际文件路径。
+            "--print", "after_move:__TUNELY_FILEPATH__%(filepath)s",
+            "--no-simulate", "--no-quiet",
             // 模拟浏览器 UA，避免部分站点（如 B 站）风控拦截导致 HTTP 412
             "--user-agent", Self.browserUserAgent,
             // 网络波动/风控时自动重试
@@ -131,6 +135,10 @@ class YtDlpService: ObservableObject {
         }
         if let proxy = proxy, !proxy.isEmpty {
             args += ["--proxy", proxy]
+        } else if platform == "网易云音乐" {
+            // macOS 系统代理可能把网易云的 HTTP 元数据请求转成 502。
+            // App 未启用代理时，对网易云明确直连；手动配置代理仍优先。
+            args += ["--proxy", ""]
         }
 
         args.append(url)
@@ -143,7 +151,16 @@ class YtDlpService: ObservableObject {
         let stream = runner.run(launchPath: ytdlp, arguments: args)
 
         for await line in stream {
+            if line.hasPrefix("__TUNELY_FILEPATH__") {
+                lastMergedPath = String(line.dropFirst("__TUNELY_FILEPATH__".count))
+                continue
+            }
             onOutput(line)
+
+            if line.hasPrefix("[ExtractAudio]") || line.hasPrefix("[Merger]")
+                || line.hasPrefix("[ffmpeg]") {
+                onProcessing()
+            }
 
             // 浏览器 Cookie 读取被系统拒绝（常见于 Safari 的 binarycookies 受 TCC 保护）
             if line.contains("binarycookies")
@@ -203,20 +220,7 @@ class YtDlpService: ObservableObject {
             return (p, FileUtil.stem(of: p))
         }
 
-        // 回退：在 outputDir 中按格式期望扩展名查找最新文件
-        let fm = FileManager.default
-        let allowed = Set(format.expectedExtensions)
-        let files = (try? fm.contentsOfDirectory(atPath: outputDir)) ?? []
-        let candidates = files
-            .filter { allowed.contains(FileUtil.ext(of: $0).lowercased()) }
-            .map { "\(outputDir)/\($0)" }
-        guard let latest = candidates.max(by: {
-            (try? fm.attributesOfItem(atPath: $0)[.modificationDate] as? Date ?? .distantPast) ?? .distantPast
-            < (try? fm.attributesOfItem(atPath: $1)[.modificationDate] as? Date ?? .distantPast) ?? .distantPast
-        }) else {
-            throw ServiceError.noOutputFile
-        }
-        return (latest, FileUtil.stem(of: latest))
+        throw ServiceError.noOutputFile
     }
 
     // MARK: - 批量下载（v2.0 歌单批量）
